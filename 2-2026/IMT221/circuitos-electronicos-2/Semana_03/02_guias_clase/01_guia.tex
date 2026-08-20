@@ -1,0 +1,341 @@
+\documentclass[11pt,a4paper,twoside]{article}
+
+% ======================================================================
+% PAQUETES Y CONFIGURACIÓN
+% ======================================================================
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,es-tabla]{babel}
+\usepackage[margin=2.5cm, headheight=35pt]{geometry}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{xcolor}
+\usepackage[colorlinks=true, linkcolor=blue, urlcolor=blue, citecolor=black]{hyperref}
+\usepackage{amsmath, amssymb}
+\usepackage{siunitx}
+\usepackage[american]{circuitikz}
+\usepackage{tcolorbox}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{listings}
+\usepackage{titlesec}
+
+% ======================================================================
+% MACROS Y ESTILOS
+% ======================================================================
+\sisetup{output-decimal-marker = {,}, per-mode = symbol}
+
+\definecolor{ucbblue}{RGB}{0,51,102}
+\definecolor{codegray}{gray}{0.95}
+
+\newtcolorbox{info}[1][]{colback=blue!5!white, colframe=ucbblue, fonttitle=\bfseries, title=Nota Pedagógica, #1}
+\newtcolorbox{spicecmd}[1][]{colback=gray!5, colframe=gray!60!black, fonttitle=\bfseries, title=Instrucciones LTSpice, #1}
+
+\newcommand{\tecla}[1]{\colorbox{gray!20}{\texttt{\footnotesize\textbf{#1}}}}
+\newcommand{\spice}[1]{\texttt{\color{purple}#1}}
+
+\lstset{
+    language=Python,
+    basicstyle=\ttfamily\footnotesize,
+    keywordstyle=\color{blue}\bfseries,
+    stringstyle=\color{teal},
+    commentstyle=\color{green!50!black}\itshape,
+    backgroundcolor=\color{codegray},
+    frame=single,
+    rulecolor=\color{gray!40},
+    breaklines=true,
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    numbersep=5pt
+}
+
+\titleformat{\section}[block]{\Large\bfseries\color{ucbblue}}{\thesection.}{0.5em}{}
+\titleformat{\subsection}[block]{\large\bfseries\color{gray!80!black}}{\thesubsection}{0.5em}{}
+
+% ======================================================================
+% CABECERAS Y METADATOS
+% ======================================================================
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE,RO]{\small\textbf{Circuitos Electrónicos II (IMT-221)}}
+\fancyhead[RE,LO]{\small Semana 3 - Sesión 2: Filtro Notch Twin-T}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+\begin{document}
+
+\begin{center}
+    \rule{\textwidth}{1.5pt}\\[0.4cm]
+    {\huge \textbf{GUÍA DE CLASE TEÓRICA}}\\[0.2cm]
+    {\LARGE \textbf{Análisis Fasorial Riguroso: Filtro Twin-T Notch}}\\[0.3cm]
+    \rule{\textwidth}{1.5pt}\\[0.5cm]
+\end{center}
+
+\begin{info}
+\textbf{¿Conviene introducir la variable $s$ (Laplace) en esta asignatura?}\\
+No. Para evitar la sobrecarga cognitiva abstracta, trabajaremos con análisis fasorial en régimen permanente sinusoidal ($j\omega$). Esto es matemáticamente exacto, conecta directamente con la instrumentación real ($\omega = 2\pi f$ se lee en el generador de funciones) y cumple rigurosamente con los criterios de acreditación ABET y CDIO mediante impedancias complejas y Leyes de Kirchhoff.
+\end{info}
+
+\section{El Problema Industrial}
+En el Proyecto Final Integrador (PFI), la señal térmica proveniente del puente de Wheatstone modula una portadora senoidal de \qty{10}{\kilo\hertz}. Sin embargo, las líneas de alimentación de los calefactores irradian un campo electromagnético a la frecuencia de red (\qty{50}{\hertz}) que se acopla a los cables del sensor con amplitudes que pueden superar a la señal útil. 
+
+Un filtro pasa-bajos convencional no sirve porque atenuaría nuestra portadora de \qty{10}{\kilo\hertz}. Se requiere un \textbf{filtro supresor de banda (Notch)} sintonizado a $f_0 = \qty{50}{\hertz}$.
+
+\section{Deducción Fasorial Rigurosa}
+
+\begin{center}
+    \begin{circuitikz}[scale=0.9, transform shape]
+        % Entrada
+        \draw (0,2) to[sV, l=$V_{in}$] (0,0) node[ground]{};
+        \draw (0,2) to[short, -*] (1.5,2);
+
+        % Separacion de ramas
+        \draw (1.5,2) -- (1.5,4.5);
+        \draw (1.5,2) -- (1.5,-0.5);
+
+        % Rama Superior (R-R-C) Paso-Bajo
+        % NOTA: Se agregaron llaves {} alrededor de las etiquetas con signo "="
+        \draw (1.5,4.5) to[R, l={$R_1=R$}] (4.5,4.5) coordinate (nA);
+        \draw (nA) to[R, l={$R_2=R$}] (7.5,4.5);
+        \draw (nA) to[C, l={$C_3=2C$}, *-] (4.5,2.5) node[ground]{};
+        \node[above=0.2cm] at (nA) {\textbf{Nodo A}};
+
+        % Rama Inferior (C-C-R) Paso-Alto
+        % NOTA: Se agregaron llaves {} alrededor de las etiquetas con signo "="
+        \draw (1.5,-0.5) to[C, l={$C_1=C$}] (4.5,-0.5) coordinate (nB);
+        \draw (nB) to[C, l={$C_2=C$}] (7.5,-0.5);
+        \draw (nB) to[R, l={$R_3=R/2$}, *-] (4.5,-2.5) node[ground]{};
+        \node[above=0.2cm] at (nB) {\textbf{Nodo B}};
+
+        % Union Salida
+        \draw (7.5,4.5) -- (7.5,2);
+        \draw (7.5,-0.5) -- (7.5,2);
+        \draw (7.5,2) to[short, *-o] (8.5,2) node[right]{\large $V_{out}$};
+    \end{circuitikz}
+\end{center}
+\noindent Definimos las impedancias de la red:
+\begin{itemize}[itemsep=2pt]
+    \item Resistencias: $Z_R = R$
+    \item Capacitores serie: $Z_C = \frac{1}{j\omega C}$
+    \item Capacitor de derivación: $Z_{C3} = \frac{1}{j\omega (2C)} = \frac{1}{2j\omega C}$
+    \item Resistencia de derivación: $Z_{R3} = \frac{R}{2}$
+\end{itemize}
+
+\subsection*{Análisis en el Nodo A (Rama Paso-Bajo)}
+Aplicando la Ley de Corrientes de Kirchhoff (LKC):
+\begin{align*}
+    \frac{\hat{V}_A - \hat{V}_{in}}{R} + \frac{\hat{V}_A - \hat{V}_{out}}{R} + \frac{\hat{V}_A}{\frac{1}{2j\omega C}} &= 0 \\
+    \text{Multiplicando la expresión por } R\text{:} \quad (\hat{V}_A - \hat{V}_{in}) + (\hat{V}_A - \hat{V}_{out}) + 2j\omega RC \hat{V}_A &= 0 \\
+    \hat{V}_A (2 + 2j\omega RC) &= \hat{V}_{in} + \hat{V}_{out} \\
+    \implies \hat{V}_A &= \frac{\hat{V}_{in} + \hat{V}_{out}}{2(1 + j\omega RC)}
+\end{align*}
+
+\subsection*{Análisis en el Nodo B (Rama Paso-Alto)}
+Aplicando LKC:
+\begin{align*}
+    \frac{\hat{V}_B - \hat{V}_{in}}{\frac{1}{j\omega C}} + \frac{\hat{V}_B - \hat{V}_{out}}{\frac{1}{j\omega C}} + \frac{\hat{V}_B}{\frac{R}{2}} &= 0 \\
+    \text{Dividiendo entre } j\omega C\text{:} \quad (\hat{V}_B - \hat{V}_{in}) + (\hat{V}_B - \hat{V}_{out}) + \frac{2}{j\omega RC} \hat{V}_B &= 0 \\
+    \hat{V}_B \left( \frac{2j\omega RC + 2}{j\omega RC} \right) &= \hat{V}_{in} + \hat{V}_{out} \\
+    \implies \hat{V}_B &= \frac{j\omega RC (\hat{V}_{in} + \hat{V}_{out})}{2(1 + j\omega RC)}
+\end{align*}
+
+\subsection*{Nodo de Salida ($\hat{V}_{out}$) en Circuito Abierto ($I_{out} = 0$)}
+La suma de las corrientes que llegan desde ambas ramas al nodo de salida debe ser cero:
+\begin{equation*}
+    \frac{\hat{V}_A - \hat{V}_{out}}{R} + \frac{\hat{V}_B - \hat{V}_{out}}{\frac{1}{j\omega C}} = 0 \implies \hat{V}_A + j\omega RC \hat{V}_B = \hat{V}_{out} (1 + j\omega RC)
+\end{equation*}
+Sustituyendo $\hat{V}_A$ y $\hat{V}_B$ en la ecuación de salida:
+\begin{align*}
+    \frac{\hat{V}_{in} + \hat{V}_{out}}{2(1 + j\omega RC)} + j\omega RC \left[ \frac{j\omega RC (\hat{V}_{in} + \hat{V}_{out})}{2(1 + j\omega RC)} \right] &= \hat{V}_{out} (1 + j\omega RC) \\
+    \text{Multiplicando por } 2(1 + j\omega RC)\text{:} \quad (\hat{V}_{in} + \hat{V}_{out}) \left[ 1 + (j\omega RC)^2 \right] &= 2\hat{V}_{out} (1 + j\omega RC)^2 \\
+    (\hat{V}_{in} + \hat{V}_{out}) (1 - \omega^2 R^2 C^2) &= 2\hat{V}_{out} (1 + 2j\omega RC - \omega^2 R^2 C^2) \\
+    \hat{V}_{in} (1 - \omega^2 R^2 C^2) &= \hat{V}_{out} \left[ 2 + 4j\omega RC - 2\omega^2 R^2 C^2 - (1 - \omega^2 R^2 C^2) \right]
+\end{align*}
+Obtenemos la \textbf{Función de Transferencia Fasorial}:
+\begin{equation*}
+    H(j\omega) = \frac{\hat{V}_{out}}{\hat{V}_{in}} = \frac{1 - \omega^2 R^2 C^2}{1 - \omega^2 R^2 C^2 + j 4\omega RC}
+\end{equation*}
+Definiendo la frecuencia de corte o resonancia $\omega_0 = \frac{1}{RC}$ (donde $f_0 = \frac{1}{2\pi RC}$):
+\begin{equation}
+    H(j\omega) = \frac{1 - \left(\frac{\omega}{\omega_0}\right)^2}{1 - \left(\frac{\omega}{\omega_0}\right)^2 + j 4 \left(\frac{\omega}{\omega_0}\right)}
+\end{equation}
+
+\section{Interpretación Física y Comportamiento Asintótico}
+\begin{itemize}
+    \item \textbf{En Resonancia ($\omega = \omega_0 \implies f = \qty{50}{\hertz}$):}
+    \begin{equation*}
+        H(j\omega_0) = \frac{1 - 1}{0 + j4(1)} = \frac{0}{j4} = 0 \implies \vert{}H(j\omega_0)\vert{} = 0\text{ V} \quad (-\infty\text{ dB})
+    \end{equation*}
+    \textit{Causa física:} A \qty{50}{\hertz}, la corriente de la rama paso-bajo sufre un retraso de fase de $-90^\circ$ y la rama paso-alto un adelanto de $+90^\circ$. Al sumarse en el nodo de salida, ambas corrientes poseen idéntica magnitud pero sentidos opuestos ($180^\circ$ entre sí), anulándose totalmente por interferencia destructiva.
+
+    \item \textbf{A Frecuencias Muy Bajas ($\omega \to 0$):}
+    \begin{equation*}
+        H(j0) = \frac{1 - 0}{1 - 0 + 0} = 1 \implies \vert{}H(j0)\vert{} = 1 \quad (0\text{ dB})
+    \end{equation*}
+
+    \item \textbf{A la Frecuencia de Portadora ($\omega = 2\pi \cdot 10\text{ kHz} \gg \omega_0$):}
+    \begin{equation*}
+        H(j\omega_{10\text{k}}) \approx \frac{-\left(\frac{\omega}{\omega_0}\right)^2}{-\left(\frac{\omega}{\omega_0}\right)^2} = 1 \implies \vert{}H(j\omega_{10\text{k}})\vert{} \approx 1 \quad (0\text{ dB})
+    \end{equation*}
+\end{itemize}
+
+\section{Efecto de la Resistencia de Carga ($R_L$)}
+Si la siguiente etapa del circuito demanda corriente con una impedancia de entrada finita $R_L$, la ecuación se modifica por el divisor de corriente:
+\begin{equation}
+    H_{cargado}(j\omega) = \frac{1 - \left(\frac{\omega}{\omega_0}\right)^2}{1 - \left(\frac{\omega}{\omega_0}\right)^2 + j 4 \left(1 + \frac{R}{R_L}\right) \left(\frac{\omega}{\omega_0}\right)}
+\end{equation}
+
+\textit{Efecto práctico:} El factor de amortiguamiento pasa de $4$ a $4\left(1 + \frac{R}{R_L}\right)$. Si $R_L$ es pequeña (ej. \qty{10}{\kilo\ohm}), la selectividad se degrada y la atenuación de la muesca cae de $\qty{-50}{\decibel}$ a solo $\qty{-21}{\decibel}$, demostrando la necesidad de acoplar un buffer de alta impedancia (Op-Amp).
+
+\newpage
+\section{Guía de Simulación en LTSpice}
+\begin{spicecmd}
+\textbf{1. Colocación de Componentes:}
+\begin{itemize}[itemsep=1pt]
+    \item $R_1 = R_2 = \qty{14.3}{\kilo\ohm}$ (Resistores al 1\%).
+    \item $C_1 = C_2 = \qty{220}{\nano\farad}$ (Capacitores de poliéster).
+    \item $C_3 = \qty{440}{\nano\farad}$ (dos capacitores de \qty{220}{\nano\farad} en paralelo).
+    \item $R_3 = \qty{7.15}{\kilo\ohm}$ (dos resistores de \qty{14.3}{\kilo\ohm} en paralelo o trimpot).
+    \item $R_L$: Resistor de carga con valor \spice{\{RL\_val\}}.
+\end{itemize}
+\textbf{2. Configuración de la Fuente ($V_1$):}\\
+Tipo: \texttt{voltage}. Propiedad: \spice{AC 1 0}.\\
+
+\textbf{3. Directivas SPICE a Escribir (Tecla \tecla{.}):}
+\begin{lstlisting}[language=SPICE, numbers=none]
+.ac dec 1000 1 10k
+.step param RL_val list 1Meg 100k 10k 1k
+\end{lstlisting}
+
+\textbf{4. Trazado y Análisis:}
+Hacer clic sobre el nodo de salida para graficar \spice{V(V\_out)}. El eje vertical mostrará la ganancia en decibelios (dB) y la fase en grados ($^\circ$). Colocar un cursor en \qty{50}{\hertz} y otro en \qty{10}{\kilo\hertz}.
+\end{spicecmd}
+
+\section{Script Maestro en Python (\texttt{lab2\_notch\_phasor.py})}
+\begin{lstlisting}
+import numpy as np
+import matplotlib.pyplot as plt
+
+# ==============================================================================
+# 1. PARAMETROS DE DISENO NOMINALES (Valores Comerciales E96 / Poliester)
+# ==============================================================================
+f0_target = 50.0                # Frecuencia de rechazo en Hz
+C_val = 220e-9                  # C = 220 nF
+R_val = 1.0 / (2 * np.pi * f0_target * C_val)  # R ~ 14468.6 Ohm -> Comercial 14.3 kOhm
+
+R = 14300.0                     # Valor real utilizado en protoboard
+C = 220e-9
+w0_calc = 1.0 / (R * C)
+f0_calc = w0_calc / (2 * np.pi)
+
+print(f"--- PARAMETROS DE DISENO DEL FILTRO TWIN-T ---")
+print(f"Frecuencia Notch Teorica Exacta: {f0_calc:.2f} Hz")
+print(f"Componentes: R = {R/1000:.1f} kOhm, C = {C*1e9:.0f} nF, 2C = {2*C*1e9:.0f} nF, R/2 = {R/2000:.2f} kOhm")
+
+# ==============================================================================
+# 2. MODELADO FASORIAL VECTORIZADO (Dominio jw)
+# ==============================================================================
+f = np.logspace(0, 4, 2000)      # Barrido de 1 Hz a 10 kHz
+w = 2 * np.pi * f
+
+cargas = {
+    'Sin Carga (1 M Ohm)': 1e6,
+    'Carga Tipica In-Amp (100 k Ohm)': 100e3,
+    'Carga Severa (10 k Ohm)': 10e3,
+    'Carga Critica (1 k Ohm)': 1e3
+}
+
+plt.figure(figsize=(10, 6))
+
+for label, RL in cargas.items():
+    numerador = 1.0 - (w / w0_calc)**2
+    denominador = (1.0 - (w / w0_calc)**2) + 1j * 4.0 * (1.0 + R / RL) * (w / w0_calc)
+    H = numerador / denominador
+    mag_db = 20 * np.log10(np.abs(H) + 1e-12)  # Prevenir log(0)
+    
+    idx_50 = np.argmin(np.abs(f - 50.0))
+    idx_10k = np.argmin(np.abs(f - 10000.0))
+    
+    print(f"\nCondicion: {label}")
+    print(f"  Atenuacion a 50 Hz:    {mag_db[idx_50]:.2f} dB")
+    print(f"  Transmision a 10 kHz:  {mag_db[idx_10k]:.4f} dB")
+    plt.semilogx(f, mag_db, label=f"{label} (Notch: {mag_db[idx_50]:.1f} dB)", linewidth=1.8)
+
+# ==============================================================================
+# 3. FORMATO Y GRAFICACION ESTANDAR IEEE
+# ==============================================================================
+plt.axvline(50.0, color='k', linestyle=':', label="Ruido de Red (50 Hz)")
+plt.axvline(10000.0, color='g', linestyle='--', label="Portadora Termica (10 kHz)")
+plt.axhline(-3.0, color='gray', linestyle='-.', label="Limite Banda de Paso (-3 dB)")
+
+plt.title("Respuesta en Frecuencia Fasorial: Filtro Twin-T Notch (50 Hz)", fontsize=12)
+plt.xlabel("Frecuencia (Hz)", fontsize=11)
+plt.ylabel("Magnitud $|H(j\omega)|$ (dB)", fontsize=11)
+plt.ylim(-65, 5)
+plt.xlim(1, 10000)
+plt.grid(True, which="both", linestyle=":", alpha=0.6)
+plt.legend(loc="lower right", fontsize=9)
+plt.tight_layout()
+plt.savefig("lab2_bode_fasorial.png", dpi=300)
+plt.show()
+\end{lstlisting}
+
+\newpage
+\section{Ejercicio de Aplicación Numérica (Resuelto para la Pizarra)}
+\textbf{Enunciado:}\\
+En la cámara térmica del PFI, un cable largo capta una interferencia de red de \qty{1.2}{\volt}$_{pico}$ a \qty{50}{\hertz}, montada sobre la portadora de \qty{10}{\kilo\hertz} cuya amplitud es de \qty{150}{\milli\volt}$_{pico}$. Se implementa un filtro Twin-T con $R = \qty{14.3}{\kilo\ohm}$ y $C = \qty{220}{\nano\farad}$.
+
+\begin{enumerate}
+    \item \textbf{Frecuencia $f_0$:}
+    \begin{equation*}
+        \omega_0 = \frac{1}{14300 \cdot 220 \times 10^{-9}} = 317.86\text{ rad/s} \implies f_0 = \frac{317.86}{2\pi} = \mathbf{50.59\text{ Hz}}
+    \end{equation*}
+
+    \item \textbf{Ruido Residual a \qty{50}{\hertz}} (asumiendo atenuación real de $\qty{-44}{\decibel}$ por tolerancia de componentes):
+    \begin{equation*}
+        \text{Ganancia Lineal } \vert{}H(j2\pi \cdot 50)\vert{} = 10^{\frac{-44}{20}} = 6.31 \times 10^{-3}
+    \end{equation*}
+    \begin{equation*}
+        \hat{V}_{ruido, out} = 1.2\text{ V}_{pico} \times 6.31 \times 10^{-3} = \mathbf{7.57\text{ mV}_{pico}}
+    \end{equation*}
+    \textit{(El ruido se redujo en más de 150 veces, quedando por debajo de la señal útil).}
+
+    \item \textbf{Transmisión de la Portadora de \qty{10}{\kilo\hertz}:}
+    \begin{equation*}
+        \frac{\omega}{\omega_0} = \frac{10000\text{ Hz}}{50.59\text{ Hz}} = 197.67
+    \end{equation*}
+    \begin{equation*}
+        H(j\omega_{10\text{k}}) = \frac{1 - (197.67)^2}{1 - (197.67)^2 + j4(197.67)} = \frac{-39072.4}{-39072.4 + j790.68} \approx \mathbf{0.9998} \angle -0.02^\circ
+    \end{equation*}
+    \begin{equation*}
+        \hat{V}_{portadora, out} = 150\text{ mV} \times 0.9998 = \mathbf{149.97\text{ mV}_{pico}} \quad (\text{Pérdida nula: } -0.0018\text{ dB})
+    \end{equation*}
+
+    \item \textbf{Efecto de Carga con $R_L = \qty{10}{\kilo\ohm}$:}
+    El factor de amortiguamiento pasa de $4$ a:
+    \begin{equation*}
+        4 \left(1 + \frac{14.3\text{ k}\Omega}{10\text{ k}\Omega}\right) = 4 (1 + 1.43) = 9.72
+    \end{equation*}
+    A \qty{50.0}{\hertz} (con $\frac{\omega}{\omega_0} = \frac{50}{50.59} = 0.9883$):
+    \begin{equation*}
+        \vert{}H_{cargado}\vert{} = \frac{\vert{}1 - (0.9883)^2\vert{}}{\sqrt{(1 - (0.9883)^2)^2 + [9.72 \cdot 0.9883]^2}} = \frac{0.0232}{\sqrt{0.00054 + 92.29}} = \frac{0.0232}{9.607} = 2.41 \times 10^{-3} \implies \mathbf{-21.3\text{ dB}}
+    \end{equation*}
+\end{enumerate}
+
+\section{Tarea de Pre-Laboratorio y Selección de Componentes}
+Para que el montaje del próximo lunes tome únicamente 15 minutos en protoboard, cada equipo de 3 estudiantes debe entregar al inicio de la sesión:
+
+\begin{enumerate}
+    \item \textbf{Selección y Emparejamiento Físico de Componentes:}\\
+    Medir con multímetro/capacímetro en el laboratorio y rotular:
+    \begin{itemize}
+        \item $R_1, R_2$: dos resistores con valor medido lo más idéntico posible a \qty{14.3}{\kilo\ohm} (error relativo entre ellos $< 0.5\%$).
+        \item $R_3$: resistor o trimpot ajustado a exactamente la mitad del promedio de $R_1$ y $R_2$ ($R/2 \approx \qty{7.15}{\kilo\ohm}$).
+        \item $C_1, C_2$: dos capacitores de \qty{220}{\nano\farad} emparejados.
+        \item $C_3$: combinación en paralelo de dos capacitores emparejados para dar exactamente $2C \approx \qty{440}{\nano\farad}$.
+    \end{itemize}
+    \item \textbf{Archivo de Simulación \texttt{.asc} de LTSpice:} Listo con las directivas de barrido frecuencial.
+    \item \textbf{Script \texttt{lab2\_notch\_phasor.py}:} Probado y listo para recibir los datos \texttt{.csv} que exportará el osciloscopio el lunes.
+\end{enumerate}
+
+\end{document}
