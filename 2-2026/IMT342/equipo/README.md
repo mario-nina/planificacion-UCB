@@ -1,60 +1,83 @@
-# Equipo IMT-342 — Robótica
+# IMT-342 — Robótica
 
-Este directorio es el espacio de trabajo del equipo dentro del repositorio académico `planificacion-UCB`, gestión II-2026, asignatura IMT-342 Robótica de la Universidad Católica Boliviana "San Pablo" — Sede Tarija.
+Espacio de trabajo del equipo para la asignatura **IMT-342 Robótica**, gestión II-2026, de la Universidad Católica Boliviana "San Pablo" — Sede Tarija.
 
-## Alcance
+El material oficial de la asignatura se mantiene en las carpetas publicadas por el docente dentro de `2-2026/IMT342/`. Los archivos desarrollados por el equipo se organizan por separado en `2-2026/IMT342/equipo/`.
 
-El repositorio del docente es la fuente oficial de material, consignas, rúbricas y automatización académica. El equipo trabajará únicamente dentro de `2-2026/IMT342` y no modificará, eliminará ni reorganizará contenido de otras materias.
+## Equipo
 
-El repositorio canónico de colaboración del equipo es el fork `mario-nina/planificacion-UCB`. Dentro de IMT-342, el trabajo producido por el equipo se concentrará bajo `2-2026/IMT342/equipo/` para mantenerlo separado del material oficial y reducir conflictos con futuras actualizaciones del docente.
+- **Roberth Williams Ruiz Condori** — GitHub: `@RWROBERTH`
+- **Mario Alberto Nina Gallo** — GitHub: `@mario-nina`
 
-## Organización del espacio del equipo
+## Estructura
 
 ```text
-2-2026/IMT342/equipo/
+equipo/
 ├── README.md
 ├── docs/
-│   ├── GIT_WORKFLOW.md
-│   ├── CONVENTIONS.md
-│   ├── PROJECT_CONTEXT.md
-│   ├── PROJECT_STATUS.md
-│   └── DECISIONS.md
-├── practicas/
-│   └── ...
-└── pfi/
+│   └── GIT_WORKFLOW.md
+├── templates/
+│   └── tp_template.ipynb
+└── practicas/
     └── ...
 ```
 
-Las carpetas `practicas/` y `pfi/` se crearán cuando exista contenido real que versionar. No se crearán directorios vacíos sólo para anticipar una estructura futura.
+- `practicas/`: trabajos prácticos desarrollados durante la asignatura.
+- `templates/`: archivos base utilizados para mantener una presentación común en los nuevos prácticos.
+- `docs/`: documentación complementaria sobre el flujo de trabajo del equipo.
 
-## Modelo de trabajo
+La estructura se amplía únicamente cuando una práctica o actividad realmente lo necesita.
 
-`main` representa el estado estable del PFI producido por el equipo y también puede recibir actualizaciones oficiales provenientes de `upstream`. `dev` es la rama de integración y el punto de partida normal del desarrollo. Las ramas `feature/*` son las ramas de trabajo.
+## Prácticos
 
-Toda `feature/*` de primer nivel nace normalmente desde `dev`, salvo instrucción oficial expresa en sentido contrario. Las ramas auxiliares de una entrega académica pueden nacer de la rama de entrega correspondiente.
+Cada trabajo práctico se desarrolla en su propia rama `feature/tpN-*`, creada normalmente a partir de `dev` actualizado.
 
-Las prácticas académicas terminan en su rama de entrega y se conservan. Las features del PFI se integran a `dev`, y los estados estables del PFI pasan posteriormente de `dev` a `main`.
+Los prácticos finalizados se conservan en sus respectivas ramas de entrega como evidencia del estado en que fueron desarrollados.
 
-## Documentación
+No se actualizan posteriormente únicamente por cambios generales en la documentación, las plantillas o la organización del repositorio. Por este motivo, `dev` funciona como base para los trabajos nuevos y no necesariamente contiene una colección acumulada de todos los prácticos realizados.
 
-| Documento | Función |
-|---|---|
-| `docs/GIT_WORKFLOW.md` | Procedimiento operativo de Git, GitHub, ramas, tareas, PR, sincronización y conflictos. |
-| `docs/CONVENTIONS.md` | Convenciones de nombres, commits, idioma y formato. |
-| `docs/PROJECT_CONTEXT.md` | Contexto estable de la materia, repositorio, TP1 y PFI. |
-| `docs/PROJECT_STATUS.md` | Estado actual del trabajo y próximos pasos. |
-| `docs/DECISIONS.md` | Registro de decisiones importantes, motivos y consecuencias. |
+### Estructura común
 
-La documentación humana se escribe en español. Los términos técnicos estándar de Git, GitHub, ROS y programación se conservan en inglés cuando resulte natural.
+Los nuevos prácticos utilizan como referencia la siguiente estructura:
 
-## Autoría y colaboración
+```text
+practicas/
+└── tpN-descripcion/
+    ├── tpN_descripcion.ipynb
+    └── evidencias/
+        └── ...
+```
 
-Cada integrante utilizará su propia cuenta de GitHub, identidad Git y credenciales. No se comparten contraseñas, tokens ni claves SSH. Cada commit debe corresponder al autor real del cambio.
+El notebook parte de `templates/tp_template.ipynb` y se adapta a la consigna correspondiente.
 
-No se empleará coautoría mediante trailers `Co-authored-by` como práctica habitual. La trazabilidad se obtiene mediante commits individuales, Issues, ramas, Pull Requests y reviews.
+Las evidencias manuscritas siguen la convención:
 
-Las tareas se asignan por unidades lógicas de trabajo y no por propiedad permanente de módulos. Si una tarea debe reasignarse, otro integrante puede continuar sobre la misma rama, preservando el historial de autores y commits.
+```text
+ejercicio<n>_hoja_<m>.jpg
+```
 
-## Precedencia
+Las entregas anteriores se conservan tal como fueron realizadas y no se modifican retroactivamente para ajustarlas a convenciones posteriores.
 
-Una instrucción explícita del docente prevalece sobre cualquier convención interna de este directorio. Si aparece una contradicción, se registra el ajuste en `docs/DECISIONS.md` y se actualiza la documentación operativa correspondiente.
+## Ramas
+
+Se mantienen las familias de ramas utilizadas en la asignatura:
+
+- `main`: rama estable y punto de incorporación de las actualizaciones oficiales del repositorio del docente.
+- `dev`: base común para iniciar nuevos trabajos del equipo.
+- `feature/*`: ramas de desarrollo para prácticos y otras actividades.
+
+El procedimiento para sincronizar el repositorio, crear ramas y trabajar con las entregas se encuentra en `docs/GIT_WORKFLOW.md`.
+
+## Convenciones
+
+Los commits utilizan **Conventional Commits** y deben representar unidades lógicas de trabajo.
+
+Formato general:
+
+```text
+<type>(<scope>): <descripcion>
+```
+
+La documentación del equipo se escribe en español, manteniendo los términos técnicos en inglés cuando resulte natural.
+
+Las instrucciones explícitas del docente tienen prioridad sobre cualquier convención interna del equipo.
