@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<package format="3">
+
+  <name>irb120_description</name>
+  <version>0.0.0</version>
+
+  <description>
+    Descripcion URDF del manipulador ABB IRB 120 para IMT-342 Robotica.
+  </description>
+
+  <maintainer email="mario.nina@ucb.edu.bo">
+    Mario Alberto Nina Gallo
+  </maintainer>
+
+  <maintainer email="roberth.ruiz@ucb.edu.bo">
+    Roberth Williams Ruiz Condori
+  </maintainer>
+
+  <license>TODO</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+
+</package>
