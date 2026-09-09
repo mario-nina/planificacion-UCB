@@ -73,3 +73,28 @@ desarrollada por el equipo.
 
 No se importó el modelo cinemático completo de ROS-Industrial.
 Las mallas se utilizaron únicamente como recurso geométrico.
+
+## Mallas de colisión del ABB IRB 120
+
+Del mismo modelo `irb120_3_58` del paquete
+`abb_irb120_support` de ROS-Industrial se utilizaron también las
+mallas STL simplificadas ubicadas en el directorio `collision`.
+
+Se incorporaron las mallas correspondientes a:
+
+- `base_link`
+- `link_1`
+- `link_2`
+- `link_3`
+- `link_4`
+- `link_5`
+- `link_6`
+
+Estas mallas se utilizan únicamente como geometría de colisión del
+URDF. Son modelos simplificados respecto de las mallas visuales y
+permiten representar los volúmenes de los eslabones con menor
+complejidad geométrica.
+
+Antes de cerrar la integración se verificó en RViz que las mallas de
+colisión mantienen una escala, posición y orientación coherentes, y que
+acompañan correctamente el movimiento de las seis articulaciones.
