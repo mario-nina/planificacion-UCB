@@ -41,3 +41,35 @@ No se encontró en la documentación oficial consultada un valor de torque
 máximo por articulación adecuado para el atributo `effort` de URDF.
 Por este motivo, estos valores se mantienen provisionalmente en `0` como
 placeholders para el modelo cinemático.
+
+## Mallas 3D del ABB IRB 120
+
+Para la representación visual del manipulador se utilizaron las mallas
+STL del modelo IRB 120 3/0.58 disponibles en el paquete
+`abb_irb120_support` del proyecto ROS-Industrial.
+
+Fuente:
+
+- Proyecto: ROS-Industrial
+- Repositorio: `ros-industrial/abb`
+- Paquete: `abb_irb120_support`
+- Modelo: `irb120_3_58`
+
+Se utilizaron las mallas correspondientes a:
+
+- `base_link`
+- `link_1`
+- `link_2`
+- `link_3`
+- `link_4`
+- `link_5`
+- `link_6`
+
+Antes de integrarlas se inspeccionó el archivo
+`irb120_3_58_macro.xacro`, verificando que las mallas se encuentran
+definidas con origen local `xyz="0 0 0"` y `rpy="0 0 0"`, y que la
+estructura de juntas es compatible con la cadena cinemática ya
+desarrollada por el equipo.
+
+No se importó el modelo cinemático completo de ROS-Industrial.
+Las mallas se utilizaron únicamente como recurso geométrico.
