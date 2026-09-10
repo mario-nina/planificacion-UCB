@@ -61,7 +61,7 @@ La geometría actual de la pinza es provisional y puede sustituirse posteriormen
 
 El TCP se encuentra a 0.120 m sobre `Z_6`, sin desfase de rotación respecto al frame `{6}`:
 
-$$
+```math
 {}^{6}T_{TCP} =
 \begin{bmatrix}
 1 & 0 & 0 & 0 \\
@@ -69,15 +69,13 @@ $$
 0 & 0 & 1 & 0.120 \\
 0 & 0 & 0 & 1
 \end{bmatrix}
-$$
+```
 
 Por tanto, la pose del TCP respecto a la base se obtiene mediante:
 
-$$
-{}^{0}T_{TCP}(q)
-=
-{}^{0}T_{6}(q)\,{}^{6}T_{TCP}
-$$
+```math
+{}^{0}T_{TCP}(q) = {}^{0}T_{6}(q)\,{}^{6}T_{TCP}
+```
 
 La cadena terminal completa del modelo queda:
 
