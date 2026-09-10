@@ -54,3 +54,40 @@ def forward_kinematics(q):
     dh_params = irb120_dh_params(q)
 
     return fk_chain(dh_params)
+
+
+def tcp_transform():
+    """
+    Construye la transformación fija desde el frame {6} al TCP.
+
+    Retorna
+    -------
+    numpy.ndarray
+        Transformación homogénea 6Ttcp.
+    """
+
+    T_6_tcp = np.eye(4)
+    T_6_tcp[2, 3] = 0.120
+
+    return T_6_tcp
+
+
+def forward_kinematics_tcp(q):
+    """
+    Calcula la pose del TCP respecto al frame base.
+
+    Parámetros
+    ----------
+    q : array-like
+        Vector articular [q1, q2, q3, q4, q5, q6] en radianes.
+
+    Retorna
+    -------
+    numpy.ndarray
+        Transformación homogénea 0Ttcp.
+    """
+
+    T_0_6 = forward_kinematics(q)
+    T_6_tcp = tcp_transform()
+
+    return T_0_6 @ T_6_tcp
