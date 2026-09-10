@@ -98,3 +98,22 @@ complejidad geométrica.
 Antes de cerrar la integración se verificó en RViz que las mallas de
 colisión mantienen una escala, posición y orientación coherentes, y que
 acompañan correctamente el movimiento de las seis articulaciones.
+
+## Revisión y licencia de las mallas ROS-Industrial
+
+Las mallas visuales y de colisión utilizadas provienen del paquete
+`abb_irb120_support`, distribuido bajo licencia Apache-2.0.
+
+La revisión del repositorio ROS-Industrial utilizada durante la
+integración fue:
+
+`45f4769d826cf3ac62a65495f2db67b78b0c81df`
+
+Se conserva una copia de la licencia correspondiente junto a las mallas
+en:
+
+`irb120_description/meshes/LICENSE_ROS_INDUSTRIAL`
+
+Esta licencia corresponde a los recursos externos provenientes de
+ROS-Industrial y no establece la licencia del código desarrollado por
+el equipo para el Hito 1.
