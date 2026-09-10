@@ -1,4 +1,5 @@
 <?xml version="1.0"?>
+
 <robot name="irb120">
 
   <!--
@@ -163,6 +164,20 @@
     <axis xyz="1 0 0"/>
     <limit lower="-6.981317" upper="6.981317"
            effort="0" velocity="7.330383"/>
+  </joint>
+
+  <!--
+    Marco auxiliar alineado con el frame {6} de la convención D-H.
+    Comparte origen con link_6 y solo modifica la orientación.
+  -->
+
+  <link name="dh_frame_6"/>
+
+  <joint name="link6_to_dh_frame_6" type="fixed">
+    <parent link="link_6"/>
+    <child link="dh_frame_6"/>
+    <origin xyz="0 0 0"
+            rpy="0 -1.5707963267948966 3.141592653589793"/>
   </joint>
 
 </robot>
