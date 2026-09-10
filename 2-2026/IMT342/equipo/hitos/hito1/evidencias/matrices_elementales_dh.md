@@ -2,26 +2,21 @@
 
 ## Matriz general
 
-La matriz de transformación homogénea D-H estándar utilizada en el modelo es:
-
 $$
 {}^{i-1}T_i =
 \begin{bmatrix}
 \cos\theta_i &
 -\sin\theta_i\cos\alpha_i &
 \sin\theta_i\sin\alpha_i &
-a_i\cos\theta_i \\
-
+a_i\cos\theta_i \\[4pt]
 \sin\theta_i &
 \cos\theta_i\cos\alpha_i &
 -\cos\theta_i\sin\alpha_i &
-a_i\sin\theta_i \\
-
+a_i\sin\theta_i \\[4pt]
 0 &
 \sin\alpha_i &
 \cos\alpha_i &
-d_i \\
-
+d_i \\[4pt]
 0 & 0 & 0 & 1
 \end{bmatrix}
 $$
@@ -29,12 +24,10 @@ $$
 Para simplificar la escritura:
 
 $$
-c_i = \cos(q_i)
+c_i = \cos(q_i),
 \qquad
 s_i = \sin(q_i)
 $$
-
----
 
 ## Transformaciones elementales
 
@@ -43,29 +36,27 @@ $$
 $$
 {}^{0}T_1 =
 \begin{bmatrix}
-c_1 & 0 & -s_1 & 0 \\
-s_1 & 0 & c_1 & 0 \\
-0 & -1 & 0 & 0.290 \\
+c_1 & 0 & -s_1 & 0 \\[4pt]
+s_1 & 0 & c_1 & 0 \\[4pt]
+0 & -1 & 0 & 0.290 \\[4pt]
 0 & 0 & 0 & 1
 \end{bmatrix}
 $$
 
 ### ${}^{1}T_2$
 
-Para esta articulación se utiliza:
+Para esta articulación:
 
 $$
 \theta_2 = q_2-\frac{\pi}{2}
 $$
 
-por lo que la matriz queda:
-
 $$
 {}^{1}T_2 =
 \begin{bmatrix}
-s_2 & c_2 & 0 & 0.270s_2 \\
--c_2 & s_2 & 0 & -0.270c_2 \\
-0 & 0 & 1 & 0 \\
+s_2 & c_2 & 0 & 0.270s_2 \\[4pt]
+-c_2 & s_2 & 0 & -0.270c_2 \\[4pt]
+0 & 0 & 1 & 0 \\[4pt]
 0 & 0 & 0 & 1
 \end{bmatrix}
 $$
@@ -75,9 +66,9 @@ $$
 $$
 {}^{2}T_3 =
 \begin{bmatrix}
-c_3 & 0 & -s_3 & 0.070c_3 \\
-s_3 & 0 & c_3 & 0.070s_3 \\
-0 & -1 & 0 & 0 \\
+c_3 & 0 & -s_3 & 0.070c_3 \\[4pt]
+s_3 & 0 & c_3 & 0.070s_3 \\[4pt]
+0 & -1 & 0 & 0 \\[4pt]
 0 & 0 & 0 & 1
 \end{bmatrix}
 $$
@@ -87,9 +78,9 @@ $$
 $$
 {}^{3}T_4 =
 \begin{bmatrix}
-c_4 & 0 & s_4 & 0 \\
-s_4 & 0 & -c_4 & 0 \\
-0 & 1 & 0 & 0.302 \\
+c_4 & 0 & s_4 & 0 \\[4pt]
+s_4 & 0 & -c_4 & 0 \\[4pt]
+0 & 1 & 0 & 0.302 \\[4pt]
 0 & 0 & 0 & 1
 \end{bmatrix}
 $$
@@ -99,9 +90,9 @@ $$
 $$
 {}^{4}T_5 =
 \begin{bmatrix}
-c_5 & 0 & -s_5 & 0 \\
-s_5 & 0 & c_5 & 0 \\
-0 & -1 & 0 & 0 \\
+c_5 & 0 & -s_5 & 0 \\[4pt]
+s_5 & 0 & c_5 & 0 \\[4pt]
+0 & -1 & 0 & 0 \\[4pt]
 0 & 0 & 0 & 1
 \end{bmatrix}
 $$
@@ -111,18 +102,14 @@ $$
 $$
 {}^{5}T_6 =
 \begin{bmatrix}
-c_6 & -s_6 & 0 & 0 \\
-s_6 & c_6 & 0 & 0 \\
-0 & 0 & 1 & 0.072 \\
+c_6 & -s_6 & 0 & 0 \\[4pt]
+s_6 & c_6 & 0 & 0 \\[4pt]
+0 & 0 & 1 & 0.072 \\[4pt]
 0 & 0 & 0 & 1
 \end{bmatrix}
 $$
 
----
-
 ## Transformación total
-
-La transformación desde el frame base hasta el frame 6 se obtiene mediante:
 
 $$
 {}^{0}T_6 =
@@ -134,11 +121,7 @@ $$
 {}^{5}T_6
 $$
 
----
-
 ## Parámetros D-H
-
-Los parámetros utilizados en el modelo cinemático del ABB IRB 120 son:
 
 | Junta | $\theta_i$ | $d_i$ [m] | $a_i$ [m] | $\alpha_i$ |
 |:---:|:---:|---:|---:|:---:|
