@@ -11,6 +11,7 @@ from launch_ros.actions import Node
 def generate_launch_description():
     package_share = get_package_share_directory("irb120_description")
     urdf_path = os.path.join(package_share, "urdf", "irb120.urdf")
+    rviz_config_path = os.path.join(package_share, "rviz", "irb120.rviz")
 
     with open(urdf_path, "r", encoding="utf-8") as urdf_file:
         robot_description = urdf_file.read()
@@ -32,6 +33,7 @@ def generate_launch_description():
         package="rviz2",
         executable="rviz2",
         output="screen",
+        arguments=["-d", rviz_config_path],
     )
 
     shutdown_on_rviz_exit = RegisterEventHandler(
