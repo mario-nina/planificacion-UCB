@@ -180,4 +180,35 @@
             rpy="0 -1.5707963267948966 3.141592653589793"/>
   </joint>
 
+  <!-- Geometria provisional de la pinza. -->
+  <link name="gripper_base">
+    <visual>
+      <origin xyz="0 0 0.030" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.060 0.050 0.060"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.030" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.060 0.050 0.060"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="dh6_to_gripper" type="fixed">
+    <parent link="dh_frame_6"/>
+    <child link="gripper_base"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <!-- TCP a 120 mm sobre Z6. -->
+  <link name="tcp"/>
+
+  <joint name="gripper_to_tcp" type="fixed">
+    <parent link="gripper_base"/>
+    <child link="tcp"/>
+    <origin xyz="0 0 0.120" rpy="0 0 0"/>
+  </joint>
+
 </robot>
