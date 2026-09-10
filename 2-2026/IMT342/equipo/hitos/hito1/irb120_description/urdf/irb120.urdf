@@ -1,0 +1,214 @@
+<?xml version="1.0"?>
+
+<robot name="irb120">
+
+  <!--
+    Visual meshes for ABB IRB 120 3/0.58.
+    Meshes are expressed in the local frame of each link.
+  -->
+
+  <link name="base_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://irb120_description/meshes/visual/base_link.stl"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://irb120_description/meshes/collision/base_link.stl"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <link name="link_1">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://irb120_description/meshes/visual/link_1.stl"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://irb120_description/meshes/collision/link_1.stl"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <link name="link_2">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://irb120_description/meshes/visual/link_2.stl"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://irb120_description/meshes/collision/link_2.stl"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <link name="link_3">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://irb120_description/meshes/visual/link_3.stl"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://irb120_description/meshes/collision/link_3.stl"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <link name="link_4">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://irb120_description/meshes/visual/link_4.stl"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://irb120_description/meshes/collision/link_4.stl"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <link name="link_5">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://irb120_description/meshes/visual/link_5.stl"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://irb120_description/meshes/collision/link_5.stl"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <link name="link_6">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://irb120_description/meshes/visual/link_6.stl"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://irb120_description/meshes/collision/link_6.stl"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="joint_1" type="revolute">
+    <parent link="base_link"/>
+    <child link="link_1"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-2.879793" upper="2.879793"
+           effort="0" velocity="4.363323"/>
+  </joint>
+
+  <joint name="joint_2" type="revolute">
+    <parent link="link_1"/>
+    <child link="link_2"/>
+    <origin xyz="0 0 0.290" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-1.919862" upper="1.919862"
+           effort="0" velocity="4.363323"/>
+  </joint>
+
+  <joint name="joint_3" type="revolute">
+    <parent link="link_2"/>
+    <child link="link_3"/>
+    <origin xyz="0 0 0.270" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-1.919862" upper="1.221730"
+           effort="0" velocity="4.363323"/>
+  </joint>
+
+  <joint name="joint_4" type="revolute">
+    <parent link="link_3"/>
+    <child link="link_4"/>
+    <origin xyz="0 0 0.070" rpy="0 0 0"/>
+    <axis xyz="1 0 0"/>
+    <limit lower="-2.792527" upper="2.792527"
+           effort="0" velocity="5.585054"/>
+  </joint>
+
+  <joint name="joint_5" type="revolute">
+    <parent link="link_4"/>
+    <child link="link_5"/>
+    <origin xyz="0.302 0 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-2.094395" upper="2.094395"
+           effort="0" velocity="5.585054"/>
+  </joint>
+
+  <joint name="joint_6" type="revolute">
+    <parent link="link_5"/>
+    <child link="link_6"/>
+    <origin xyz="0.072 0 0" rpy="0 0 0"/>
+    <axis xyz="1 0 0"/>
+    <limit lower="-6.981317" upper="6.981317"
+           effort="0" velocity="7.330383"/>
+  </joint>
+
+  <!--
+    Marco auxiliar alineado con el frame {6} de la convención D-H.
+    Comparte origen con link_6 y solo modifica la orientación.
+  -->
+
+  <link name="dh_frame_6"/>
+
+  <joint name="link6_to_dh_frame_6" type="fixed">
+    <parent link="link_6"/>
+    <child link="dh_frame_6"/>
+    <origin xyz="0 0 0"
+            rpy="0 -1.5707963267948966 3.141592653589793"/>
+  </joint>
+
+  <!-- Geometria provisional de la pinza. -->
+  <link name="gripper_base">
+    <visual>
+      <origin xyz="0 0 0.030" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.060 0.050 0.060"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.030" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.060 0.050 0.060"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="dh6_to_gripper" type="fixed">
+    <parent link="dh_frame_6"/>
+    <child link="gripper_base"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <!-- TCP a 120 mm sobre Z6. -->
+  <link name="tcp"/>
+
+  <joint name="gripper_to_tcp" type="fixed">
+    <parent link="gripper_base"/>
+    <child link="tcp"/>
+    <origin xyz="0 0 0.120" rpy="0 0 0"/>
+  </joint>
+
+</robot>
