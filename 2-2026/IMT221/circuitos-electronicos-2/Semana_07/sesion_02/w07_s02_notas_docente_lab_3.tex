@@ -1,0 +1,67 @@
+\documentclass[11pt, a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{tgpagella}
+\usepackage[spanish, es-noshorthands]{babel}
+\usepackage{booktabs}
+\usepackage[most]{tcolorbox}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{fancyhdr}
+
+\pagestyle{fancy}
+\fancyhf{}
+\setlength{\headheight}{16pt}
+\lhead{\textbf{UCB Sede Tarija}}
+\chead{Notas de Pre-Lab / Lab 3}
+\rhead{Circuitos Electrónicos II}
+\renewcommand{\headrulewidth}{0.4pt}
+\definecolor{ucbblue}{RGB}{0, 51, 102}
+
+\begin{document}
+
+\begin{center}
+    \Large\textbf{\textcolor{ucbblue}{Notas Docentes: Pre-Lab y Ejecución Lab 3}}[cite: 11]
+\end{center}
+
+\section*{Evidencia Ideal Esperada del Estudiante[cite: 11]}
+\begin{itemize}
+    \item Derivación simbólica completa del amplificador diferencial[cite: 11].
+    \item Verificación explícita de los ratios ($R_2/R_1 = R_4/R_3$)[cite: 11].
+    \item Resultado ideal numérico para cada condición experimental elegida[cite: 11].
+    \item Comparación formal entre el modelo ideal vs. resultados de LTSpice[cite: 11].
+\end{itemize}
+
+\section*{Errores Conceptuales Comunes a Vigilar[cite: 11]}
+\begin{itemize}
+    \item Confundir $V_{OS}$ interno con una diferencia de tensión aplicada externamente[cite: 11].
+    \item Tratar $V_+ \approx V_-$ como una verdad física irrefutable, ignorando la ganancia finita y el offset[cite: 11].
+    \item Asumir que $I_B = 0$ físicamente, ignorando las caídas de tensión resistivas de la fuente[cite: 11].
+    \item Atribuir automáticamente todo error de salida al Op-Amp sin auditar el circuito[cite: 11].
+    \item Confundir mismatch de resistores externos con el offset interno del componente[cite: 11].
+    \item Creer ciegamente que LTSpice constituye validación del circuito físico real[cite: 11].
+\end{itemize}
+
+\section*{Errores de Simulación Frecuentes en el Pre-Lab[cite: 11]}
+\begin{itemize}
+    \item Utilizar un modelo SPICE distinto del LM741 sin registrar la divergencia[cite: 11].
+    \item Omitir conectar las fuentes de alimentación ($\pm15\,\text{V}$) requeridas por el macromodelo[cite: 11].
+    \item Invertir la conexión de entradas (señal a $V_+$ en lugar de $V_-$ o viceversa)[cite: 11].
+    \item Usar una referencia de tierra en simulación distinta a la real[cite: 11].
+    \item Asumir que el macromodelo implementa todas las no idealidades que documenta el datasheet[cite: 11].
+\end{itemize}
+
+\section*{Framework de Troubleshooting (Semana 8)[cite: 11]}
+Obligar a los grupos a descartar causas en este orden estricto de menor a mayor abstracción[cite: 11]:
+\begin{enumerate}
+    \item \textbf{Supply rails:} ¿Están presentes, en $\pm15\,\text{V}$ y con polaridad correcta?[cite: 11]
+    \item \textbf{Ground / reference:} ¿Todas las mediciones comparten la misma referencia física prevista?[cite: 11]
+    \item \textbf{Pinout:} ¿Entradas, salidas y alimentación coinciden con el LM741 DIP-8?[cite: 11]
+    \item \textbf{Feedback:} ¿Existe realimentación negativa hacia el pin correcto?[cite: 11]
+    \item \textbf{Resistor values:} Medir los resistores en ohmios reales y comprobar las razones (mismatch)[cite: 11].
+    \item \textbf{Input signals:} Medir $V_1$ y $V_2$ físicamente; no asumir lo que indica el generador/fuente[cite: 11].
+    \item \textbf{Measurement setup:} Verificar rango, referencia, canal y conexión del instrumento[cite: 11].
+    \item \textbf{Real-device nonideality:} Solo después de lo anterior, invocar $V_{OS}, I_B, I_{OS}$[cite: 11].
+\end{enumerate}
+
+\end{document}

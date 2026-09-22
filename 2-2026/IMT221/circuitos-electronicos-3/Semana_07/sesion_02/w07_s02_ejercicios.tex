@@ -1,0 +1,62 @@
+\PassOptionsToPackage{table,xcdraw}{xcolor}
+\documentclass[11pt, a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{tgpagella}
+\usepackage[spanish, es-noshorthands]{babel}
+\usepackage{amsmath, amssymb}
+\usepackage[most]{tcolorbox}
+\usepackage[american]{circuitikz}
+\usepackage{tabularx}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{fancyhdr}
+
+\pagestyle{fancy}
+\fancyhf{}
+\setlength{\headheight}{16pt}
+\lhead{\textbf{UCB Sede Tarija} | Ing. Mecatrónica}
+\rhead{IMT-221 | Ejercicio Guiado S07-2}
+\renewcommand{\headrulewidth}{0.4pt}
+\definecolor{ucbblue}{RGB}{0, 51, 102}
+
+\begin{document}
+
+\begin{tcolorbox}[colback=ucbblue!5, colframe=ucbblue, title=\textbf{Ejercicio Guiado: Análisis Analítico DC del Par Diferencial}]
+    Desarrollo matemático paso a paso del estado balanceado y verificación de la región de operación. \textit{Los valores de este ejercicio son de carácter pedagógico}[cite: 16].
+\end{tcolorbox}
+
+\section*{Circuito bajo análisis}
+Se presenta un Par Diferencial BJT NPN. Ambos transistores son idénticos con $\beta = 120$ y $V_{BE(on)} \approx 0.7\,\text{V}$[cite: 16].
+Las entradas están conectadas a tierra ($v_1 = v_2 = 0\,\text{V}$)[cite: 16].
+\textbf{Valores dados:} $V_{CC} = +5\,\text{V}$, $V_{EE} = -5\,\text{V}$, $I_T = 1.2\,\text{mA}$, $R_{C1} = R_{C2} = R_C = 2.7\,\text{k}\Omega$[cite: 16].
+
+\begin{center}
+\begin{circuitikz}[scale=0.85, transform shape, thick]
+    \draw (0,0) node[npn](Q1){}; \node[left=0.2cm] at (Q1.B) {$v_1 = 0\,\text{V}$};
+    \draw (4,0) node[npn, xscale=-1](Q2){}; \node[right=0.2cm] at (Q2.B) {$v_2 = 0\,\text{V}$};
+    \draw (Q1.C) to[R, l={$R_C$}, i={$I_{C1}$}] (0,2.5) -- (4,2.5) to[R, l_={$R_C$}, i_={$I_{C2}$}] (Q2.C);
+    \draw (2,2.5) -- (2,3) node[above]{$+5\,\text{V}$};
+    \draw (Q1.E) -- (0,-1.5) -- (4,-1.5) -- (Q2.E);
+    \draw (2,-1.5) to[I, l={$I_T = 1.2\,\text{mA}$}] (2,-3.5) node[below]{$-5\,\text{V}$};
+    \draw (Q1.B) to[short, -o] (-1,0);
+    \draw (Q2.B) to[short, -o] (5,0);
+    \draw (Q1.C) to[short, *-o] (-1,1) node[left]{$v_{C1}$};
+    \draw (Q2.C) to[short, *-o] (5,1) node[right]{$v_{C2}$};
+\end{circuitikz}
+\end{center}
+
+\section*{Derivación Matemática}
+Resuelva secuencialmente detallando cada cálculo analítico:
+
+\begin{enumerate}
+    \item \textbf{Corrientes de Emisor:} Escriba la ecuación de KCL en el nodo del emisor común. Sabiendo que $v_1 = v_2$, argumente la simetría y calcule los valores de $I_{E1}$ e $I_{E2}$[cite: 16]. \vspace{1.5cm}
+    \item \textbf{Parámetro $\alpha$:} Calcule explícitamente el valor de $\alpha = \frac{\beta}{\beta+1}$ para el $\beta$ dado[cite: 16]. \vspace{1cm}
+    \item \textbf{Corrientes de Colector:} Calcule matemáticamente $I_{C1}$ e $I_{C2}$ usando $\alpha$ y los valores de $I_E$[cite: 16]. \vspace{1cm}
+    \item \textbf{Tensiones de Colector ($v_C$):} Usando la Ley de Ohm y KVL desde la fuente superior, escriba la ecuación para $v_{C1}$ y calcule su valor. Repita para $v_{C2}$[cite: 16]. \vspace{1.5cm}
+    \item \textbf{Tensión de Emisor ($v_E$):} Utilizando el voltaje en las bases y $V_{BE}$, determine el potencial del nodo emisor común frente a tierra[cite: 16]. \vspace{1cm}
+    \item \textbf{Verificación de Activa Directa:} Calcule el voltaje Colector-Emisor ($V_{CE} = v_C - v_E$) para ambas ramas. Compruebe si se cumple la condición de no-saturación ($V_{BC} < 0$)[cite: 16]. \vspace{1.5cm}
+    \item \textbf{Conclusión de Punto Q:} Escriba el Punto de Operación estático $Q_1$ y $Q_2$, y determine el voltaje de salida diferencial quiescente ($V_{OD,Q} = v_{C2} - v_{C1}$)[cite: 16].
+\end{enumerate}
+
+\end{document}

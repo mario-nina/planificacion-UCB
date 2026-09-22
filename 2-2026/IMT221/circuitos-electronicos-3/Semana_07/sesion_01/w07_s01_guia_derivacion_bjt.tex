@@ -1,0 +1,241 @@
+\PassOptionsToPackage{table,xcdraw}{xcolor}
+\documentclass[11pt, a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{tgpagella}
+\usepackage[spanish, es-noshorthands]{babel}
+\usepackage{amsmath, amssymb, bm}
+\usepackage[most]{tcolorbox}
+\usepackage{tabularx}
+\usepackage[american]{circuitikz}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{fancyhdr}
+
+\pagestyle{fancy}
+\fancyhf{}
+\setlength{\headheight}{16pt}
+\lhead{\textbf{UCB Sede Tarija} | Ing. Mecatrónica}
+\rhead{IMT-221 | Guía de Derivación Visual S07-1}
+\renewcommand{\headrulewidth}{0.4pt}
+\definecolor{ucbblue}{RGB}{0, 51, 102}
+
+\begin{document}
+
+\begin{tcolorbox}[colback=ucbblue!5, colframe=ucbblue, title=\textbf{Guía Asincrónica: Derivación Visual y Matemática de CE, CC y CB}]
+    \textbf{Propósito del artefacto:} Esta guía permite reconstruir, paso a paso, las relaciones principales de las tres configuraciones BJT[cite: 14]. La meta no es memorizar tres formularios distintos, sino reconocer visual y matemáticamente que todas nacen del \textbf{mismo modelo incremental}[cite: 14]. 
+    La cadena de razonamiento es:
+    $$ Q \rightarrow g_m, r_\pi \rightarrow \text{Modelo de Pequeña Señal} \rightarrow \text{Equivalente AC} \rightarrow A_v, R_{in}, R_{out} $$
+\end{tcolorbox}
+
+\section{El Modelo Base Incremental}
+A temperatura ambiente ($T \approx 300\,\text{K}$), se asume $V_T \approx 25.85\,\text{mV}$[cite: 14]. El modelo incremental se evalúa en el punto de operación $Q$:
+\begin{equation*}
+    g_m = \frac{I_{CQ}}{V_T}, \qquad r_\pi = \frac{\beta}{g_m}, \qquad r_e \approx \frac{1}{g_m} \text{ (asumiendo $\alpha \approx 1$)} \quad \text{[cite: 14]}
+\end{equation*}
+
+\textbf{El Modelo Híbrido-$\pi$ universal} que utilizaremos e insertaremos en cada topología es[cite: 14]:
+\begin{center}
+\begin{circuitikz}[scale=1, transform shape, thick]
+    \draw (0,0) node[above]{Base (B)} to[R, l={$r_\pi$}, i={$i_b$}, v={$v_\pi$}] (0,-2.5) node[below]{Emisor (E)};
+    \draw (4,0) node[above]{Colector (C)} to[cI, l={$i_c = g_m v_\pi$}] (4,-2.5) -- (0,-2.5);
+    \draw (0,0) -- (-0.5,0); \draw (4,0) -- (4.5,0);
+\end{circuitikz}
+\end{center}
+
+\textbf{Hipótesis para todas las derivaciones[cite: 14]:} Transistor en región activa directa; pequeña señal en banda media; fuentes DC ideales $\to$ \textbf{Tierra AC}; se desprecia el Efecto Early ($r_o \to \infty$)[cite: 14].
+
+\newpage
+% ==========================================
+% EMISOR COMÚN
+% ==========================================
+\section{Emisor Común (CE)}
+
+\subsection{Circuito Físico y Topología}
+\begin{center}
+\begin{circuitikz}[scale=0.9, transform shape, thick]
+    \draw (0,0) node[npn](Q){};
+    \draw (Q.E) node[ground]{};
+    \draw (Q.C) to[R, l_={$R_C$}] (0,2) node[ground, rotate=180]{};
+    \draw (Q.B) to[short, -o] (-1.5,0) node[left]{$v_i$};
+    \draw (Q.C) to[short, *-o] (1.5,0.77) node[right]{$v_o$};
+    \node[blue] at (0,-2) {Terminal Común en AC: Emisor};
+\end{circuitikz}
+\end{center}
+Entrada: Base. Salida: Colector. Común: Emisor[cite: 14].
+
+\subsection{Equivalente AC (Sustituyendo el Modelo Híbrido-$\pi$)}
+Insertamos el modelo Híbrido-$\pi$ conectando el \textbf{Emisor a Tierra}[cite: 14].
+\begin{center}
+\begin{circuitikz}[scale=0.9, transform shape, thick]
+    % Entrada
+    \draw (-2,0) to[short, o-] (0,0) node[above]{B};
+    \node[left] at (-2,0) {$v_i$};
+    \draw (0,0) to[R, l={$r_\pi$}, v={$v_\pi$}] (0,-2.5) node[ground]{} node[left]{E (Tierra AC)};
+    % Salida
+    \draw (3,0) node[above]{C} to[cI, l={$g_m v_\pi$}] (3,-2.5) node[ground]{};
+    \draw (3,0) -- (5,0) to[R, l={$R_C'$}] (5,-2.5) node[ground]{};
+    \draw (5,0) to[short, *-o] (6.5,0) node[right]{$v_o$};
+    \node[blue] at (4, -4) {Nota: $R_C'$ representa $R_C \parallel R_L$};
+\end{circuitikz}
+\end{center}
+
+\subsection{Derivación Matemática}
+\textbf{Ganancia ($A_v$):}
+\begin{enumerate}
+    \item Observando el esquema, el emisor está a tierra, por lo que la tensión $v_\pi$ es idéntica a la entrada[cite: 14]:
+    $$ v_\pi = v_i \quad \text{[cite: 14]} $$
+    \item La fuente dependiente extrae corriente del nodo de colector: $i_c = g_m v_\pi = g_m v_i$[cite: 14].
+    \item Esta corriente sube desde tierra a través de $R_C'$ hacia el colector, generando una caída negativa por Ley de Ohm[cite: 14]:
+    $$ v_o = -i_c R_C' = -g_m v_i R_C' \quad \text{[cite: 14]} $$
+    \item Dividiendo obtenemos:
+    $$ \boxed{A_{v,CE} = \frac{v_o}{v_i} \approx -g_m (R_C \parallel R_L)} \quad \text{[cite: 14]} $$
+    El signo negativo indica que \textbf{CE es inversor}[cite: 14].
+\end{enumerate}
+
+\textbf{Impedancias:}
+\begin{itemize}
+    \item $R_{in,BJT} = v_i / i_b = v_\pi / (v_\pi/r_\pi) = \mathbf{r_\pi}$[cite: 14]. Si hay polarización $R_B$, $R_{in} = \mathbf{R_B \parallel r_\pi}$[cite: 14].
+    \item Apagando $v_i$, la fuente $g_m v_\pi$ se abre. Mirando hacia la salida, solo vemos $R_C \implies R_{out} \approx \mathbf{R_C}$[cite: 14].
+\end{itemize}
+
+\newpage
+% ==========================================
+% COLECTOR COMÚN
+% ==========================================
+\section{Colector Común (CC) / Seguidor de Emisor}
+
+\subsection{Circuito Físico y Topología}
+\begin{center}
+\begin{circuitikz}[scale=0.9, transform shape, thick]
+    \draw (0,0) node[npn](Q){};
+    \draw (Q.C) -- (0,1.5) node[above]{$+V_{CC}$};
+    \draw (Q.B) to[short, -o] (-1.5,0) node[left]{$v_i$};
+    \draw (Q.E) to[R, l_={$R_E$}] (0,-2) node[ground]{};
+    \draw (Q.E) to[short, *-o] (1.5,-0.77) node[right]{$v_o$};
+    \node[blue] at (0,-3) {Terminal Común en AC: Colector ($\Delta V_{CC} = 0 \to \text{Tierra AC}$)};
+\end{circuitikz}
+\end{center}
+Entrada: Base. Salida: Emisor. Común: Colector[cite: 14].
+
+\subsection{Equivalente AC (Sustituyendo el Modelo Híbrido-$\pi$)}
+Insertamos el modelo conectando el \textbf{Colector a Tierra AC} y añadiendo la carga en el emisor[cite: 14].
+\begin{center}
+\begin{circuitikz}[scale=0.9, transform shape, thick]
+    % Entrada
+    \draw (-2,0) to[short, o-] (0,0) node[above]{B};
+    \node[left] at (-2,0) {$v_i$};
+    % r_pi
+    \draw (0,0) to[R, l={$r_\pi$}, i={$i_b$}, v={$v_\pi$}] (0,-2.5) node[left]{E};
+    % Fuente dependiente (Colector a Tierra AC)
+    \draw (3,-2.5) to[cI, l={$g_m v_\pi$}] (3,0) node[right]{C (Tierra AC)} node[ground, rotate=180]{};
+    \draw (0,-2.5) -- (3,-2.5);
+    % Carga en emisor
+    \draw (1.5,-2.5) to[R, l={$R_E'$}] (1.5,-5) node[ground]{};
+    \draw (3,-2.5) to[short, *-o] (4.5,-2.5) node[right]{$v_o$};
+    \node[blue] at (1.5, -6.5) {Nota: $R_E'$ representa $R_E \parallel R_L$};
+\end{circuitikz}
+\end{center}
+
+\subsection{Derivación Matemática}
+\textbf{Ganancia ($A_v$) y Reflexión de Impedancia:}
+\begin{enumerate}
+    \item En el nodo Emisor (E), la corriente total que baja hacia $R_E'$ es la suma de la corriente de base y la fuente dependiente: $i_e = i_b + g_m v_\pi$[cite: 14]. 
+    \item Sabiendo que $g_m v_\pi = \beta i_b$, entonces $i_e = (\beta + 1) i_b$[cite: 14].
+    \item La tensión de salida es la caída en $R_E'$: 
+    $$ v_o = i_e R_E' = (\beta + 1) i_b R_E' \quad \text{[cite: 14]} $$
+    \item Aplicando Kirchhoff en la malla de entrada, $v_i = v_\pi + v_o$[cite: 14]. Sustituyendo $v_\pi = i_b r_\pi$[cite: 14]:
+    $$ v_i = i_b r_\pi + (\beta + 1) i_b R_E' = i_b [r_\pi + (\beta + 1) R_E'] \quad \text{[cite: 14]} $$
+    \item Dividiendo $v_o / v_i$:
+    $$ A_v = \frac{(\beta+1)R_E'}{r_\pi + (\beta+1)R_E'} \quad \text{[cite: 14]} $$
+    \item Dividiendo todo entre $(\beta+1)$ y recordando que $\frac{r_\pi}{\beta+1} \approx r_e$[cite: 14]:
+    $$ \boxed{A_{v,CC} \approx \frac{R_E'}{r_e + R_E'}} \quad \text{[cite: 14]} $$
+    Dado que $R_E' \gg r_e$, la ganancia es \textbf{positiva y cercana a 1}[cite: 14].
+\end{enumerate}
+
+\textbf{Impedancias:}
+\begin{itemize}
+    \item De la ecuación del paso 4, $R_{in,B} = v_i / i_b = \mathbf{r_\pi + (\beta+1)R_E'}$[cite: 14]. ¡La resistencia del emisor se refleja multiplicada por $\beta+1$![cite: 14]
+    \item $R_{out,CC} \approx \mathbf{r_e}$ (si la fuente es ideal), lo que lo hace un excelente buffer[cite: 14].
+\end{itemize}
+
+\newpage
+% ==========================================
+% BASE COMÚN
+% ==========================================
+\section{Base Común (CB)}
+
+\subsection{Circuito Físico y Topología}
+\begin{center}
+\begin{circuitikz}[scale=0.9, transform shape, thick]
+    \draw (0,0) node[npn](Q){};
+    \draw (Q.B) node[ground]{};
+    \draw (Q.E) to[short, -o] (-1.5,-0.77) node[left]{$v_i$};
+    \draw (Q.C) to[R, l_={$R_C$}] (0,2) node[ground, rotate=180]{};
+    \draw (Q.C) to[short, *-o] (1.5,0.77) node[right]{$v_o$};
+    \node[blue] at (0,-2) {Terminal Común en AC: Base};
+\end{circuitikz}
+\end{center}
+Entrada: Emisor. Salida: Colector. Común: Base[cite: 14].
+
+\subsection{Equivalente AC (Sustituyendo el Modelo Híbrido-$\pi$)}
+Insertamos el modelo conectando la \textbf{Base a Tierra AC}[cite: 14]. Note cuidadosamente la polaridad de $v_\pi$.
+\begin{center}
+\begin{circuitikz}[scale=0.9, transform shape, thick]
+    % Base a tierra
+    \draw (0,0) node[left]{B (Tierra AC)} node[ground, rotate=180]{} -- (0,-0.5);
+    % r_pi
+    \draw (0,-0.5) to[R, l={$r_\pi$}, v_<={$v_\pi$}] (0,-3) node[below]{E};
+    % Entrada
+    \draw (-2,-3) to[short, o-] (0,-3);
+    \node[left] at (-2,-3) {$v_i$};
+    % Fuente dependiente
+    \draw (3,-3) to[cI, l_={$g_m v_\pi$}] (3,-0.5) node[above]{C};
+    \draw (0,-3) -- (3,-3);
+    % RC y salida
+    \draw (3,-0.5) -- (5,-0.5) to[R, l={$R_C'$}] (5,-3) node[ground]{};
+    \draw (5,-0.5) to[short, *-o] (6.5,-0.5) node[right]{$v_o$};
+\end{circuitikz}
+\end{center}
+
+\subsection{Derivación Matemática}
+\textbf{Ganancia ($A_v$) y $R_{in}$:}
+\begin{enumerate}
+    \item La base está en tierra AC, por lo que $v_b = 0$[cite: 14].
+    \item La tensión incremental base-emisor es: $v_\pi = v_b - v_e = 0 - v_i = -v_i$[cite: 14].
+    \item La fuente de corriente del colector es $i_c = g_m v_\pi = -g_m v_i$[cite: 14].
+    \item La tensión de salida se produce por la corriente $i_c$ atravesando $R_C'$ desde tierra[cite: 14]:
+    $$ v_o = -i_c R_C' \quad \text{[cite: 14]} $$
+    \item Sustituyendo $i_c$: 
+    $$ v_o = -(-g_m v_i) R_C' = g_m v_i R_C' \quad \text{[cite: 14]} $$
+    \item Dividiendo obtenemos:
+    $$ \boxed{A_{v,CB} = \frac{v_o}{v_i} \approx +g_m (R_C \parallel R_L)} \quad \text{[cite: 14]} $$
+    El signo positivo indica que \textbf{CB NO invierte la fase}[cite: 14].
+    \item \textbf{Resistencia de entrada:} La corriente de emisor total que entra es $i_e = i_b + i_c = \frac{v_\pi}{r_\pi} + g_m v_\pi$[cite: 14]. La impedancia vista en el emisor es intrínsecamente muy baja: $R_{in,CB} = \frac{v_i}{i_e} \approx \mathbf{r_e \approx \frac{1}{g_m}}$[cite: 14].
+\end{enumerate}
+
+\newpage
+\section{Comparación Matemática Unificada y Ejercicios}
+\renewcommand{\arraystretch}{1.8}
+\begin{tabularx}{\textwidth}{|>{\raggedright\arraybackslash}p{2.5cm}|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|}
+\hline
+\rowcolor{ucbblue!20}
+\textbf{Cantidad} & \textbf{Emisor Común (CE)} & \textbf{Colector Común (CC)} & \textbf{Base Común (CB)} \\ \hline
+\textbf{Entrada/Salida} & Base / Colector & Base / Emisor & Emisor / Colector \quad \text{[cite: 14]} \\ \hline
+\textbf{Común AC} & Emisor & Colector & Base \quad \text{[cite: 14]} \\ \hline
+\textbf{Ganancia $A_v$} & $-g_m R_C'$ & $\frac{R_E'}{r_e + R_E'}$ & $+g_m R_C'$ \quad \text{[cite: 14]} \\ \hline
+\textbf{Fase} & Inversora & No inversora & No inversora \quad \text{[cite: 14]} \\ \hline
+\textbf{$R_{in}$ intrínseca} & $r_\pi$ & $r_\pi + (\beta+1)R_E'$ & $r_e$ \quad \text{[cite: 14]} \\ \hline
+\textbf{$R_{out}$ tendencia} & Moderada/Alta & Baja & Moderada/Alta \quad \text{[cite: 14]} \\ \hline
+\textbf{Rol primario} & Ganancia de tensión & Buffer & Interfaz baja-$R_{in}$ \quad \text{[cite: 14]} \\ \hline
+\end{tabularx}
+
+\subsection*{Ejercicios de Consolidación (Autoevaluación)}
+Para verificar la comprensión, reconstruya las derivaciones anteriores (Circuito $\to$ Modelo AC $\to$ Ecuación) para los siguientes casos numéricos[cite: 14].
+\begin{enumerate}
+    \item \textbf{Ejercicio CE:} $I_C=1.5\,\text{mA}$, $\beta=120$, $R_C=3.3\,\text{k}\Omega$, $R_L=10\,\text{k}\Omega$[cite: 14]. Determine $g_m$, $r_\pi$, $A_v$ y analice el efecto del signo negativo en la fase[cite: 14].
+    \item \textbf{Ejercicio CC:} $I_C=2\,\text{mA}$, $\beta=100$, $R_E=1.2\,\text{k}\Omega$, $R_L=2.2\,\text{k}\Omega$[cite: 14]. Demuestre matemáticamente por qué la tensión de salida $v_o$ casi iguala a la tensión de entrada $v_i$, probando su función de buffer[cite: 14].
+    \item \textbf{Ejercicio CB:} $I_C=0.8\,\text{mA}$, $R_C=4.7\,\text{k}\Omega$, $R_L=10\,\text{k}\Omega$[cite: 14]. Calcule el valor de $R_{in}$ y deduzca a partir de la ley de mallas por qué esta topología no invierte la fase[cite: 14].
+\end{enumerate}
+
+\end{document}

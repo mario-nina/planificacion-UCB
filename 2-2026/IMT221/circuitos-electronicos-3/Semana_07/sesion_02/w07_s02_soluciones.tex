@@ -1,0 +1,49 @@
+\PassOptionsToPackage{table,xcdraw}{xcolor}
+\documentclass[11pt, a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{tgpagella}
+\usepackage[spanish, es-noshorthands]{babel}
+\usepackage{amsmath, amssymb}
+\usepackage[most]{tcolorbox}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{fancyhdr}
+
+\pagestyle{fancy}
+\fancyhf{}
+\setlength{\headheight}{16pt}
+\lhead{\textbf{UCB Sede Tarija} | Ing. Mecatrónica}
+\rhead{IMT-221 | Soluciones S07-2}
+\renewcommand{\headrulewidth}{0.4pt}
+
+\begin{document}
+
+\section*{Solucionario y Guía para Retroalimentación Docente}
+
+\subsection*{Resolución: Diagnóstico Transversal (Circuito de Base Común)}
+\begin{enumerate}
+    \item \textbf{Terminales:} Entrada por el \textbf{emisor}, salida por el \textbf{colector}. Terminal común: \textbf{Base} (conectada a Tierra AC). (Nota: La figura del diagnóstico mostraba entrada en emisor y $R_C'$ al colector; es un CB)[cite: 16].
+    \item \textbf{Parámetros intrínsecos:} $g_m = \frac{I_{CQ}}{V_T}$ y $r_e \approx \frac{1}{g_m}$[cite: 16].
+    \item \textbf{Equivalente AC:} Alumno debe dibujar Base a tierra. El modelo T es ideal aquí.
+    \item \textbf{KVL/KCL inicial (Modelo T):} El voltaje en el emisor determina la caída base-emisor. Al estar la base en $0\,\text{V}$, $v_{be} = -v_i$[cite: 16]. Por tanto, la corriente de fuente dependiente es $i_c = -g_m v_i$[cite: 16].
+    \item \textbf{Supuestos:} Pequeña señal, $r_o \to \infty$, banda media, operación en Activa Directa[cite: 16].
+\end{enumerate}
+\textbf{Sonda Docente:} Si el estudiante aplica $A_v = -g_m R_C$ ciegamente. \textit{Pregunta:} "Sigue la corriente desde tu entrada en el emisor hasta tu salida en el colector. ¿En qué dirección cruza la carga $R_C$? ¿Invierte la fase o no?"[cite: 16].
+
+\subsection*{Resolución: Ejercicio Guiado Par Diferencial DC}
+\textbf{Valores dados:} $V_{CC}=5\,\text{V}$, $V_{EE}=-5\,\text{V}$, $I_T=1.2\,\text{mA}$, $R_C=2.7\,\text{k}\Omega$, $\beta=120$, $v_1=v_2=0\,\text{V}$[cite: 16].
+
+\begin{enumerate}
+    \item \textbf{Corrientes de Emisor:} KCL en nodo común $\implies I_{E1} + I_{E2} = I_T$[cite: 16]. Por simetría perfecta con entradas iguales ($v_1=v_2$), $I_{E1} = I_{E2}$. $\implies 2 I_E = 1.2\,\text{mA} \implies \mathbf{I_{E1} = I_{E2} = 0.6\,\text{mA}}$[cite: 16].
+    \item \textbf{Cálculo de $\alpha$:} $\alpha = \frac{\beta}{\beta+1} = \frac{120}{121} \approx \mathbf{0.99174}$[cite: 16].
+    \item \textbf{Corrientes de Colector:} $I_C = \alpha I_E = (0.99174)(0.6\,\text{mA}) \approx \mathbf{0.595\,\text{mA}}$[cite: 16].
+    \item \textbf{Tensiones de Colector ($v_C$):} Por Ley de Ohm: caída $V_{RC} = I_C \cdot R_C = (0.595\text{m})(2.7\text{k}) = 1.6065\,\text{V}$[cite: 16]. Por KVL: $v_{C1} = v_{C2} = V_{CC} - V_{RC} = 5\,\text{V} - 1.6065\,\text{V} = \mathbf{3.3935\,\text{V}}$[cite: 16].
+    \item \textbf{Tensión de Emisor ($v_E$):} KVL de base a emisor: $v_B - v_{BE} = v_E \implies 0\,\text{V} - 0.7\,\text{V} = \mathbf{-0.7\,\text{V}}$[cite: 16].
+    \item \textbf{Verificación:} $V_{CE} = v_C - v_E = 3.3935\,\text{V} - (-0.7\,\text{V}) = \mathbf{4.0935\,\text{V}}$[cite: 16]. Como $V_{BC} = 0 - 3.3935 < 0$, las uniones Base-Colector están inversamente polarizadas. Opera correctamente en \textbf{Activa Directa}[cite: 16].
+    \item \textbf{Conclusión:} Puntos estáticos: $\mathbf{Q_1 = Q_2 \approx (0.595\,\text{mA}, 4.094\,\text{V})}$[cite: 16]. El voltaje de salida diferencial es $V_{OD,Q} = v_{C2} - v_{C1} = 3.3935 - 3.3935 = \mathbf{0\,\text{V}}$[cite: 16].
+\end{enumerate}
+
+\textbf{Direccionamiento Cualitativo (Sonda Docente):} Si un estudiante indica que $v_C$ sube cuando $v_B$ sube. \textit{Pregunta:} "Aplica tu ecuación de la parte 4: $v_C = V_{CC} - I_C R_C$. Si $v_B$ sube, el transistor conduce más ($I_C$ sube). ¿Qué le pasa a la resta final $v_C$?"[cite: 16].
+
+\end{document}

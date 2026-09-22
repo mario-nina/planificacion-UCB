@@ -1,0 +1,66 @@
+\PassOptionsToPackage{table,xcdraw}{xcolor}
+\documentclass[11pt, a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{tgpagella}
+\usepackage[spanish, es-noshorthands]{babel}
+\usepackage{amsmath, amssymb}
+\usepackage[most]{tcolorbox}
+\usepackage[american]{circuitikz}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{fancyhdr}
+
+\pagestyle{fancy}
+\fancyhf{}
+\setlength{\headheight}{16pt}
+\lhead{\textbf{UCB Sede Tarija} | Ing. Mecatrónica}
+\rhead{IMT-221 | Diagnóstico S07-2}
+\renewcommand{\headrulewidth}{0.4pt}
+\definecolor{ucbblue}{RGB}{0, 51, 102}
+
+\begin{document}
+
+\begin{tcolorbox}[colback=ucbblue!5, colframe=ucbblue, title=\textbf{Diagnóstico Formativo: Transferencia del Método Incremental}]
+    Tiempo estimado: 8-10 minutos. Este diagnóstico busca evidenciar si sabes \textbf{cómo iniciar una derivación matemática} usando un método común, en lugar de recuperar fórmulas finales de memoria[cite: 16].
+\end{tcolorbox}
+
+\section*{Análisis de Topología}
+Se te presenta la siguiente topología de amplificador. Asume que el transistor opera en región activa directa y que el punto $Q$ ($I_{CQ}$) ya ha sido calculado[cite: 16].
+
+\vspace{0.3cm}
+\noindent
+\begin{minipage}{0.4\textwidth}
+    \begin{center}
+    \begin{circuitikz}[scale=1, transform shape, thick]
+        \draw (0,0) node[npn](Q){};
+        \draw (Q.B) node[ground]{};
+        \draw (Q.E) to[short, -o] (-1.5,-0.77) node[left]{$v_i$};
+        \draw (Q.C) to[R, l_={$R_C'$}] (0,2) node[ground, rotate=180]{};
+        \draw (Q.C) to[short, *-o] (1.5,0.77) node[right]{$v_o$};
+    \end{circuitikz}
+    \end{center}
+\end{minipage}%
+\hfill
+\begin{minipage}{0.55\textwidth}
+    \textbf{1. Identificación de Topología:}
+    \begin{itemize}
+        \item Nodo de Entrada: \rule{4cm}{0.15mm}
+        \item Nodo de Salida: \rule{4cm}{0.15mm}
+        \item Nodo Común (Tierra AC): \rule{3.2cm}{0.15mm}
+    \end{itemize}
+    \vspace{0.3cm}
+    \textbf{2. Parámetros dependientes del Punto Q:} \\
+    Escribe explícitamente las ecuaciones para calcular los parámetros que usarás en tu modelo (ej. $g_m, r_e, r_\pi$) en función de $I_{CQ}$ y $V_T$[cite: 16]. \vspace{1cm}
+\end{minipage}
+
+\vspace{0.5cm}
+\textbf{3. Elección de Modelo y Ecuaciones Base:} \\
+Selecciona el \textit{Modelo Híbrido-$\pi$} o el \textit{Modelo T} (Justifica tu elección brevemente basándote en el terminal de entrada)[cite: 16]. Escribe las \textbf{dos primeras ecuaciones algebraicas} (KVL o KCL) que relacionan la variable de entrada ($v_i$) con la fuente de corriente interna del transistor ($i_c$) y el voltaje de salida ($v_o$)[cite: 16]. No escribas el resultado final directamente.
+\vspace{4cm}
+
+\textbf{4. Impedancias de Puerto:} \\
+Explica brevemente (con palabras o una ecuación) cómo abordarías el cálculo de la resistencia de entrada ($R_{in}$) mirando hacia los terminales del amplificador[cite: 16].
+\vspace{2cm}
+
+\end{document}
