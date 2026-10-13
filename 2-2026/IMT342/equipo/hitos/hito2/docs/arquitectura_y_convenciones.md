@@ -205,3 +205,66 @@ Los cambios se registrarán mediante commits Git de alcance lógico, siguiendo `
 - `equipo/hitos/hito1/validacion/resultados.md`.
 
 La reutilización de la FK, la arquitectura modular y la organización de evidencias son decisiones técnicas del equipo. Los requisitos académicos concretos se encuentran documentados por separado en `requisitos_y_fuentes.md`.
+
+## 9. Registro de incorporación de la base cinemática
+
+**Fecha de incorporación:** 2026-10-13.
+
+**Procedencia:** Hito 1, directorio `modelo_cinematico/cinematica_directa/`.
+
+**Referencia Git:** `eb42875`, commit de reorganización del modelo cinemático. Esta referencia identifica la versión consultada de los archivos, no necesariamente su creación original.
+
+### Archivos incorporados
+
+| Archivo | Hash Git del original | Adaptación |
+|---|---|---|
+| `dh.py` | `c5685190c5ed34d38721a71cce31f459d4873caa` | Ninguna |
+| `irb120_fk.py` | `78fcbdb1b58d956fbb8b2e5fee762f9632dc00a4` | Importación relativa |
+
+La modificación en `irb120_fk.py` fue exclusivamente:
+
+```diff
+-from dh import fk_chain
++from .dh import fk_chain
+```
+
+Se añadió `src/__init__.py` para organizar los archivos como paquete Python.
+
+No se modificaron los parámetros D-H, las funciones matemáticas ni los archivos históricos del Hito 1.
+
+### Validación funcional local
+
+Se ejecutaron cuatro pruebas automatizadas con `unittest`:
+
+- Configuración articular cero.
+- Ortogonalidad y determinante de la matriz de rotación.
+- Desplazamiento fijo de 0.120 m entre brida y TCP.
+- Rechazo de vectores articulares de dimensión inválida.
+
+**Resultado:** 4 pruebas satisfactorias, 0 fallidas.
+
+Desde la raíz de `hito2/`, el comando de ejecución es:
+
+```bash
+python -m unittest discover -s validacion -p "test_*.py" -v
+```
+
+### Comparación con la implementación original
+
+Se ejecutó una comparación temporal entre las funciones FK y TCP del Hito 1 y las copias locales del Hito 2 para tres configuraciones articulares:
+
+1. `[0, 0, 0, 0, 0, 0]`
+2. `[0.2, -0.3, 0.4, 0.5, -0.6, 0.7]`
+3. `[-0.5, 0.4, -0.2, 1.0, 0.3, -0.8]`
+
+Se utilizó una tolerancia absoluta de `1e-12`, sin tolerancia relativa, para comparar las matrices homogéneas.
+
+**Resultado observado:** error máximo de `0.000e+00` en FK y TCP para las tres configuraciones.
+
+La comparación con el Hito 1 fue una auditoría puntual de la incorporación. No constituye una dependencia de ejecución del Hito 2.
+
+### Alcance de la validación
+
+Las pruebas demuestran la equivalencia numérica de las implementaciones en los casos examinados y la ejecución correcta del paquete local.
+
+No representan una nueva validación física del ABB IRB 120 ni validan todavía los algoritmos propios del Hito 2.
