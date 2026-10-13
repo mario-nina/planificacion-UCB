@@ -262,3 +262,103 @@ Por tanto, los resultados actuales constituyen soluciones matemáticas comprobad
 - `src/pieper.py`: implementación propia del Hito 2.
 - `validacion/test_pieper.py`: pruebas automatizadas.
 - `src/irb120_fk.py`: cinemática directa reutilizada y validada.
+
+
+## 7. Diagrama específico: filtrado ABB y selección de soluciones
+
+Este diagrama representa el módulo `src/seleccion_pieper.py`, que procesa las soluciones matemáticas obtenidas mediante `src/pieper.py`.
+
+Los límites articulares corresponden a los rangos nominales publicados por ABB, documentados en `arquitectura_y_convenciones.md`, sección 10.
+
+```mermaid
+flowchart TD
+    A["Recibir resultado Pieper, q_inicio y pesos"]
+    B["Validar entradas y limites de q_inicio"]
+    C["Recorrer soluciones verificadas por FK"]
+    D{"¿Cumple limites ABB?"}
+    E["Registrar rama y juntas fuera de limites"]
+    F["Generar variantes equivalentes de J6"]
+    G{"¿Existen variantes admisibles?"}
+    H["Registrar descarte"]
+    I["Calcular costo ponderado por variante"]
+    J["Agregar configuraciones admisibles"]
+    K{"¿Quedan ramas por procesar?"}
+    L["Ordenar candidatas por costo"]
+    M{"¿Hay candidatas admisibles?"}
+    N["Seleccionar la de menor costo"]
+    O["Seleccionada = None"]
+    P["Conservar diagnosticos y advertencias"]
+    Q["Devolver ResultadoSeleccion"]
+
+    A --> B
+    B --> C
+    C --> D
+    D -->|No| E
+    D -->|Si| F
+    E --> K
+    F --> G
+    G -->|No| H
+    G -->|Si| I
+    H --> K
+    I --> J
+    J --> K
+    K -->|Si| C
+    K -->|No| L
+    L --> M
+    M -->|Si| N
+    M -->|No| O
+    N --> P
+    O --> P
+    P --> Q
+```
+
+### Criterio de selección
+
+Entre las representaciones articulares admisibles se utiliza:
+
+\[
+C(q)=\sum_{i=1}^{6}w_i(q_i-q_{inicio,i})^2
+\]
+
+La solución seleccionada es aquella que minimiza el costo.
+
+Los pesos son configurables; por defecto cada articulación tiene peso unitario.
+
+### Tratamiento de J6
+
+El módulo considera representaciones equivalentes:
+
+\[
+q_6'=q_6+2k\pi
+\]
+
+con \(k\) entero y siempre dentro del rango nominal ABB de -400° a +400°.
+
+Se conservan las representaciones admisibles para evaluar cuál requiere menor desplazamiento desde `q_inicio`.
+
+### Información conservada
+
+La salida `ResultadoSeleccion` mantiene:
+
+- Configuraciones admisibles y sus costos.
+- Ramas descartadas y sus violaciones de límites.
+- Configuración seleccionada, si existe.
+- Diagnósticos originales de Pieper y advertencias adicionales.
+
+### Validación y limitaciones
+
+El 13 de octubre de 2026 se ejecutaron 24 pruebas satisfactorias: cuatro de FK, siete de Pieper, seis de límites articulares y siete de selección.
+
+El módulo no evalúa colisiones ni factibilidad temporal. Las configuraciones seleccionadas aún requieren un análisis LSPB y validación de velocidades y aceleraciones.
+
+Las soluciones singulares corresponden a representantes particulares y no a una exploración exhaustiva de las familias continuas.
+
+### Referencias
+
+- `3HAC035960-005`, revisión W, sección 1.8.1, página impresa 37.
+- `3HAC035728-005`, revisión W, sección 2.2.2, página impresa 50.
+- `docs/arquitectura_y_convenciones.md`, secciones 10 y 11.
+- `src/limites_irb120.py`.
+- `src/seleccion_pieper.py`.
+- `validacion/test_limites_irb120.py`.
+- `validacion/test_seleccion_pieper.py`.

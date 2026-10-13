@@ -268,3 +268,161 @@ La comparación con el Hito 1 fue una auditoría puntual de la incorporación. N
 Las pruebas demuestran la equivalencia numérica de las implementaciones en los casos examinados y la ejecución correcta del paquete local.
 
 No representan una nueva validación física del ABB IRB 120 ni validan todavía los algoritmos propios del Hito 2.
+
+## 10. Límites articulares oficiales del ABB IRB 120
+
+### 10.1. Fuentes primarias
+
+Los rangos articulares nominales fueron contrastados con dos documentos oficiales del fabricante:
+
+1. **ABB Robotics.** *Especificaciones del producto — IRB 120*. Documento `3HAC035960-005`, revisión W, sección 1.8.1 «Área de trabajo y tipo de movimiento», página impresa 37.
+2. **ABB Robotics.** *Manual del producto — IRB 120*. Documento `3HAC035728-005`, revisión W, sección 2.2.2 «Área de trabajo y tipo de movimiento», página impresa 50.
+
+Ambas fuentes coinciden en los siguientes rangos:
+
+| Junta | Mínimo (°) | Máximo (°) |
+|---|---:|---:|
+| J1 | -165 | +165 |
+| J2 | -110 | +110 |
+| J3 | -110 | +70 |
+| J4 | -160 | +160 |
+| J5 | -120 | +120 |
+| J6 | -400 | +400 |
+
+Los límites se convertirán a radianes para su uso en Python, manteniendo los valores oficiales en grados como referencia documental.
+
+### 10.2. Correspondencia geométrica
+
+La página impresa 36 de `3HAC035960-005`, revisión W, identifica una configuración con J2 = 0° y J3 = 0°, cuyo centro de muñeca presenta X = 302 mm y Z = 630 mm.
+
+La cinemática directa validada en el Hito 1 produce, para la configuración articular cero, una posición de centro de muñeca de `[0.302, 0.000, 0.630]` m.
+
+Esta coincidencia respalda la correspondencia de la configuración de referencia entre el modelo académico y los datos geométricos publicados por ABB.
+
+### 10.3. Condiciones y restricciones
+
+Los valores corresponden a los rangos nominales publicados para el IRB 120.
+
+ABB indica que el rango predeterminado del eje 6 puede ampliarse mediante configuración de software. No se considerará habilitada ninguna extensión sin evidencia de la configuración efectiva.
+
+El *Manual del producto*, sección 2.4.1, página impresa 73, advierte que el área de trabajo puede necesitar restricciones adicionales por riesgos de colisión y que determinadas limitaciones requieren ajustes de configuración.
+
+Por tanto, las comprobaciones de límites articulares realizadas en Python no equivalen a una certificación de seguridad ni sustituyen las restricciones operativas del controlador y de la instalación real.
+
+### 10.4. Aplicación al método de Pieper
+
+La cinemática inversa generará primero las soluciones matemáticas y después aplicará los rangos articulares respaldados por ABB.
+
+La salida deberá conservar la identificación de rama y las razones del descarte, indicando qué articulación excede sus límites.
+
+Se considerarán las representaciones articulares equivalentes separadas por vueltas completas cuando correspondan y estén dentro de límites; esto es especialmente importante para J6.
+
+La posterior selección de una configuración para LSPB utilizará criterios técnicos declarados por el equipo. No se atribuirá al fabricante un algoritmo de selección que ABB no haya especificado en estas fuentes.
+
+### 10.5. Limitaciones pendientes
+
+No se ha comprobado la configuración de un controlador físico específico ni se dispone de evidencia sobre modificaciones particulares de límites, opciones de giro extendido o restricciones de la celda.
+
+La validación actual contempla el modelo académico del IRB 120 con los rangos nominales de los manuales consultados.
+
+La verificación de colisiones, velocidad, aceleración, carga y condiciones reales de operación pertenece a evaluaciones adicionales y no queda demostrada por el mero cumplimiento de los rangos angulares.
+
+
+## 11. Integración de límites y selección de soluciones de Pieper
+
+### 11.1. Arquitectura implementada
+
+El Hito 2 utiliza tres módulos independientes:
+
+- `src/pieper.py`: genera soluciones analíticas y comprueba su equivalencia con la pose objetivo mediante cinemática directa.
+- `src/limites_irb120.py`: comprueba los rangos articulares nominales del fabricante y genera representaciones equivalentes de J6.
+- `src/seleccion_pieper.py`: filtra las soluciones de Pieper y selecciona una configuración utilizando un criterio de desplazamiento articular.
+
+Los límites nominales provienen de los manuales ABB identificados en la sección 10. El criterio de selección es una decisión técnica del equipo.
+
+### 11.2. Interfaz de selección
+
+La función principal es:
+
+```python
+filtrar_y_seleccionar_pieper(
+    resultado,
+    q_inicio,
+    *,
+    pesos=None,
+)
+```
+
+Donde:
+
+- `resultado` es un objeto `PieperResult` devuelto por `solve_pieper`.
+- `q_inicio` es un vector de seis posiciones articulares iniciales, en radianes, que debe cumplir los límites nominales ABB.
+- `pesos` es un vector opcional de seis ponderaciones no negativas, con al menos un valor positivo. Por defecto se utilizan seis ponderaciones iguales a uno.
+
+La función devuelve un objeto `ResultadoSeleccion` con:
+
+- `admisibles`: representaciones articulares dentro de límites, con sus errores FK y costos.
+- `descartadas`: ramas rechazadas y violaciones articulares correspondientes.
+- `seleccionada`: configuración con menor costo, o `None` si no existe una candidata admisible.
+- `diagnosticos`: información de Pieper y advertencias de la selección.
+
+### 11.3. Criterio matemático
+
+La función utiliza un costo de desplazamiento articular ponderado:
+
+\[
+C(q)=\sum_{i=1}^{6}w_i(q_i-q_{inicio,i})^2
+\]
+
+Se selecciona la configuración admisible con el menor costo.
+
+Este criterio no demuestra ausencia de colisiones, factibilidad temporal, cumplimiento de límites de velocidad/aceleración ni optimización de energía o torque.
+
+### 11.4. Tratamiento de J6
+
+El rango nominal ABB de J6 es de -400° a +400°.
+
+Por ello, el módulo considera representaciones equivalentes:
+
+\[
+q_6'=q_6+2k\pi,\qquad k\in\mathbb Z
+\]
+
+Sólo conserva aquellas que cumplen los límites del fabricante.
+
+Las representaciones equivalentes producen la misma pose según FK, pero pueden generar desplazamientos articulares diferentes desde la configuración inicial.
+
+Las articulaciones J1–J5 no se modifican al generar estas variantes.
+
+### 11.5. Validación realizada
+
+El 13 de octubre de 2026 se ejecutó la batería completa de pruebas del Hito 2:
+
+- 4 pruebas de FK.
+- 7 pruebas de Pieper.
+- 6 pruebas de límites ABB.
+- 7 pruebas de selección.
+
+**Resultado: 24 pruebas satisfactorias, ninguna fallida.**
+
+La prueba de integración de referencia confirmó ocho ramas matemáticas, seis descartes por límites articulares, dos ramas geométricas admisibles y cuatro representaciones admisibles al considerar las vueltas de J6.
+
+También se verificaron entradas inválidas, conservación de diagnósticos, rechazo de J3 fuera de rango, selección de la vuelta de J6 más cercana y manejo de representantes singulares.
+
+### 11.6. Limitaciones
+
+El tratamiento actual de singularidades utiliza representantes particulares y no explora exhaustivamente las familias continuas de soluciones.
+
+La selección no incluye detección de colisiones, límites de velocidad, límites de aceleración ni una trayectoria temporal completa.
+
+El vector seleccionado constituye una propuesta de `q_final` para LSPB, pendiente de comprobación de factibilidad temporal y de trayectoria.
+
+El cumplimiento de límites nominales no certifica seguridad operativa ni equivalencia con la configuración de un controlador ABB real.
+
+### 11.7. Fuentes y evidencias
+
+**Fuentes oficiales:** manuales ABB referenciados en la sección 10 y guías W09-S01/W09-S02 del docente.
+
+**Implementaciones:** `src/pieper.py`, `src/limites_irb120.py` y `src/seleccion_pieper.py`.
+
+**Pruebas:** `validacion/test_pieper.py`, `validacion/test_limites_irb120.py` y `validacion/test_seleccion_pieper.py`.
