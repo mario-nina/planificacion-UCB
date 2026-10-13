@@ -362,3 +362,110 @@ Las soluciones singulares corresponden a representantes particulares y no a una 
 - `src/seleccion_pieper.py`.
 - `validacion/test_limites_irb120.py`.
 - `validacion/test_seleccion_pieper.py`.
+
+
+## 8. Diagrama específico: planificación articular LSPB
+
+Este diagrama representa la implementación de `src/lspb.py`, que genera una trayectoria articular de reposo a reposo a partir de las posiciones inicial y final.
+
+El fundamento matemático procede de W09-S01 del material oficial del docente. Los límites de velocidad del ABB IRB 120 proceden del manual del fabricante documentado en `arquitectura_y_convenciones.md`, sección 12.
+
+```mermaid
+flowchart TD
+    A["Recibir q_inicio, q_final, tf y aceleraciones"]
+    B["Validar dimensiones, valores finitos y parametros positivos"]
+    C{"¿Movimiento de 6 juntas?"}
+    D["Comprobar posiciones iniciales y finales contra limites ABB"]
+    E["Aplicar velocidades nominales ABB"]
+    F["Usar cotas de velocidad suministradas, si existen"]
+    G["Determinar velocidades maximas efectivas"]
+    H["Calcular desplazamientos articulares"]
+    I{"¿Aceleraciones suficientes para tf?"}
+    J["Rechazar perfil inviable"]
+    K["Calcular tiempos de mezcla tc"]
+    L["Calcular velocidades de crucero"]
+    M{"¿Se cumplen limites de velocidad?"}
+    N["Crear PerfilLSPB"]
+    O["Recibir instante o vector de tiempos"]
+    P{"¿Tiempos dentro de 0 a tf?"}
+    Q["Evaluar fases de aceleracion, crucero y frenado"]
+    R["Devolver q, qdot y qddot"]
+
+    A --> B --> C
+    C -->|Si| D --> E --> F  --> G
+    C -->|No| F --> G
+    G --> H --> I
+    I -->|No| J
+    I -->|Si| K --> L --> M
+    M -->|No| J
+    M -->|Si| N --> O --> P
+    P -->|No| J
+    P -->|Si| Q --> R
+```
+
+### Etapas matemáticas
+
+Para cada articulación:
+
+\[
+\Delta q_i=q_{final,i}-q_{inicio,i}
+\]
+
+Se comprueba:
+
+\[
+a_i\geq\frac{4|\Delta q_i|}{t_f^2}
+\]
+
+Si la condición se cumple, se calculan:
+
+\[
+t_{c,i}=
+\frac{t_f-\sqrt{t_f^2-4|\Delta q_i|/a_i}}{2}
+\]
+
+\[
+v_{c,i}=\operatorname{sgn}(\Delta q_i)a_i t_{c,i}
+\]
+
+La implementación emplea una expresión algebraicamente equivalente para calcular `tc` con mayor estabilidad numérica.
+
+### Evaluación por fases
+
+La función `perfil.evaluar(t)` calcula:
+
+1. Aceleración inicial.
+2. Movimiento a velocidad constante, cuando existe.
+3. Frenado hasta el reposo.
+
+En el perfil triangular no existe un intervalo de crucero de duración positiva.
+
+Para desplazamientos nulos, la articulación permanece inmóvil.
+
+### Sincronización de seis articulaciones
+
+Las seis articulaciones utilizan la misma duración total `tf`, aunque cada una puede tener un tiempo de mezcla `tc` diferente.
+
+La evaluación devuelve posiciones, velocidades y aceleraciones para los instantes solicitados.
+
+### Restricciones y alcance
+
+Para 6R, se aplican los límites nominales de posición y velocidad ABB.
+
+Las aceleraciones son parámetros de planificación elegidos por el equipo; no se consideran especificaciones certificadas del fabricante.
+
+El módulo comprueba factibilidad cinemática y temporal del perfil bajo las restricciones suministradas. No verifica colisiones, torques ni factibilidad dinámica.
+
+### Validación
+
+El 13 de octubre de 2026 se ejecutaron 38 pruebas satisfactorias del Hito 2, incluidas 14 pruebas del módulo LSPB.
+
+Entre ellas se verificó la integración FK → Pieper → selección articular → LSPB → FK final.
+
+### Referencias
+
+- `S09_material_oficial.pdf`, W09-S01, diapositivas 8–10.
+- ABB `3HAC035960-005`, revisión W, sección 1.8.3, página impresa 40.
+- `docs/arquitectura_y_convenciones.md`, secciones 12 y 13.
+- `src/lspb.py`.
+- `validacion/test_lspb.py`.
