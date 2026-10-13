@@ -146,3 +146,119 @@ No se considerarán terminados estos diagramas hasta estudiar y comprobar los pr
 - Diagramas del Hito 1: `equipo/hitos/hito1/docs/diagramas_flujo.md`.
 
 Los flujos aquí descritos corresponden al diseño técnico del equipo. Los requisitos específicos del docente se identifican en `requisitos_y_fuentes.md`.
+
+## 6. Diagrama específico: cinemática inversa analítica de Pieper
+
+Este diagrama representa el procedimiento implementado en `src/pieper.py` para el ABB IRB 120, utilizando el modelo D-H incorporado desde el Hito 1.
+
+```mermaid
+flowchart TD
+    A["Recibir pose objetivo 4x4"]
+    B["Validar dimensiones y matriz de rotación"]
+    C{"¿Objetivo TCP?"}
+    D["Convertir pose TCP a brida"]
+    E["Utilizar pose de brida"]
+    F["Calcular centro de muñeca"]
+    G["Calcular rho, h, L y beta"]
+    H{"¿Centro geométricamente alcanzable?"}
+    I["Registrar objetivo inalcanzable"]
+    J["Generar direcciones candidatas de J1"]
+    K["Resolver ramas J2 y J3"]
+    L["Calcular R03 para cada rama"]
+    M["Calcular R36 = R03 transpuesta por R06"]
+    N{"¿Muñeca singular?"}
+    O["Obtener representante usando q_seed"]
+    P["Resolver dos ramas regulares J4, J5 y J6"]
+    Q["Formar configuraciones articulares"]
+    R["Normalizar ángulos"]
+    S["Comprobar posición y orientación con FK"]
+    T{"¿Cumple tolerancias?"}
+    U["Registrar diagnóstico de descarte"]
+    V["Evitar soluciones duplicadas"]
+    W["Devolver soluciones y diagnósticos"]
+
+    A --> B
+    B --> C
+    C -->|Sí| D
+    C -->|No| E
+    D --> E
+    E --> F
+    F --> G
+    G --> H
+    H -->|No| I
+    H -->|Sí| J
+    J --> K
+    K --> L
+    L --> M
+    M --> N
+    N -->|Sí| O
+    N -->|No| P
+    O --> Q
+    P --> Q
+    Q --> R
+    R --> S
+    S --> T
+    T -->|No| U
+    T -->|Sí| V
+    V --> W
+    U --> W
+    I --> W
+```
+
+Las operaciones sobre las ramas de brazo y muñeca se repiten para cada candidata. El diagrama resume el procedimiento; los bucles y condiciones exactos se encuentran en el código fuente.
+
+### Interfaz implementada
+
+La función principal es:
+
+```python
+solve_pieper(
+    T_target,
+    target_frame="flange",
+    q_seed=None,
+    position_tolerance_m=1e-8,
+    orientation_tolerance_rad=1e-7,
+    singularity_tolerance=1e-9,
+)
+```
+
+- `T_target`: matriz homogénea objetivo de 4 × 4.
+- `target_frame`: `"flange"` o `"tcp"`.
+- `q_seed`: referencia articular opcional, en radianes, utilizada para elegir representantes en ciertos casos singulares. No selecciona la solución final de una lista de ramas regulares.
+- `position_tolerance_m`: tolerancia de validación FK en metros.
+- `orientation_tolerance_rad`: tolerancia de orientación en radianes.
+- `singularity_tolerance`: umbral numérico utilizado para detectar situaciones geométricas degeneradas o singulares.
+
+La salida `PieperResult` incluye:
+
+- `solutions`: candidatas que superaron la comprobación FK.
+- `wrist_center_m`: posición del centro de muñeca en el marco base.
+- `diagnostics`: mensajes relativos a singularidades, imposibilidades geométricas y descartes.
+
+Cada objeto `PieperSolution` registra sus seis ángulos articulares, las ramas de brazo y muñeca, los errores de reconstrucción y si representa un caso singular.
+
+### Validación inicial realizada
+
+El 13 de octubre de 2026 se ejecutaron desde `hito2/` las pruebas automatizadas con `unittest`.
+
+Resultado: **11 pruebas satisfactorias**, incluyendo cuatro de FK y siete de Pieper.
+
+La prueba de Pieper contempla una pose con ocho ramas regulares, entradas de TCP, casos singulares, entrada inválida, objetivo inalcanzable y 100 configuraciones articulares aleatorias.
+
+El código verifica las transformaciones candidatas usando la FK local del Hito 2.
+
+### Limitaciones actuales
+
+El algoritmo todavía no aplica los límites articulares del fabricante ni comprueba colisiones. Tampoco selecciona automáticamente la candidata óptima para el posterior movimiento LSPB.
+
+En singularidades devuelve un representante de la familia de soluciones y registra la situación mediante los diagnósticos correspondientes.
+
+Por tanto, los resultados actuales constituyen soluciones matemáticas comprobadas mediante FK, no una garantía de ejecución física en el ABB IRB 120.
+
+### Referencias
+
+- `S09_material_oficial.pdf`, guía W09-S01: ramas analíticas y verificación por cinemática directa.
+- `S09_material_oficial.pdf`, guía final W09-S02: integración de Pieper en el pipeline del Hito 2.
+- `src/pieper.py`: implementación propia del Hito 2.
+- `validacion/test_pieper.py`: pruebas automatizadas.
+- `src/irb120_fk.py`: cinemática directa reutilizada y validada.
