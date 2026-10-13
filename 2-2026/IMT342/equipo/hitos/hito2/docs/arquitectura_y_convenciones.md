@@ -426,3 +426,275 @@ El cumplimiento de límites nominales no certifica seguridad operativa ni equiva
 **Implementaciones:** `src/pieper.py`, `src/limites_irb120.py` y `src/seleccion_pieper.py`.
 
 **Pruebas:** `validacion/test_pieper.py`, `validacion/test_limites_irb120.py` y `validacion/test_seleccion_pieper.py`.
+
+
+## 12. Parámetros documentados para planificación LSPB
+
+### 12.1. Velocidades articulares oficiales
+
+**Fuente:** ABB Robotics, *Especificaciones del producto — IRB 120*, documento `3HAC035960-005`, revisión W, sección 1.8.3 «Velocidad», página impresa 40.
+
+La tabla corresponde al robot IRB 120-3/0.6.
+
+| Articulación | Velocidad ABB (°/s) |
+|---|---:|
+| J1 | 250 |
+| J2 | 250 |
+| J3 | 250 |
+| J4 | 320 |
+| J5 | 320 |
+| J6 | 420 |
+
+Para su utilización en Python, los valores se convertirán de grados por segundo a radianes por segundo.
+
+El fabricante advierte que las aplicaciones con movimientos intensos y frecuentes requieren supervisión para evitar sobrecalentamientos.
+
+Los valores publicados no constituyen una garantía de factibilidad de cualquier trayectoria ni sustituyen las restricciones del controlador y la instalación.
+
+### 12.2. Aceleraciones de planificación
+
+En las fuentes ABB examinadas no se identificó una tabla de aceleraciones articulares máximas equivalente a la tabla de velocidades.
+
+Por ello, las aceleraciones utilizadas inicialmente en LSPB serán parámetros de planificación académica, expresamente declarados y justificados.
+
+No se presentarán como límites físicos certificados del fabricante.
+
+### 12.3. Convenciones para LSPB
+
+La entrada prevista del módulo incluirá:
+
+- `q_inicio`: configuración inicial de seis articulaciones, en radianes.
+- `q_final`: configuración final admisible seleccionada por Pieper, en radianes.
+- `tf`: duración global de la trayectoria, en segundos.
+- Límites de velocidad: seis valores positivos, en radianes por segundo.
+- Aceleraciones de planificación: seis magnitudes positivas, en radianes por segundo al cuadrado.
+- `t`: instantes de evaluación de la trayectoria, en segundos.
+
+Las salidas previstas serán:
+
+- `q(t)`: posiciones articulares, en radianes.
+- `qdot(t)`: velocidades articulares, en radianes por segundo.
+- `qddot(t)`: aceleraciones articulares, en radianes por segundo al cuadrado.
+- `tc`: tiempos de mezcla por articulación, en segundos.
+- Diagnósticos de factibilidad y cumplimiento de restricciones.
+
+Las seis articulaciones compartirán una duración global `tf`. Cada articulación podrá tener su propio tiempo de mezcla, según su desplazamiento y aceleración elegida.
+
+### 12.4. Criterios de validación
+
+El módulo deberá comprobar:
+
+1. Condiciones iniciales y finales.
+2. Continuidad de posición y velocidad.
+3. Cálculo correcto de los tiempos de mezcla.
+4. Cumplimiento de los límites de velocidad publicados por ABB.
+5. Cumplimiento de las aceleraciones adoptadas para planificación.
+6. Manejo de desplazamientos positivos, negativos y nulos.
+7. Sincronización temporal de las seis articulaciones.
+
+La aceleración ideal LSPB es discontinua en los cambios de fase. Por tanto, no se exigirá continuidad de aceleración donde el propio modelo no la garantiza.
+
+### 12.5. Fundamento académico
+
+**Material del docente:** `S09_material_oficial.pdf`, W09-S01, diapositivas y hoja de trabajo sobre LSPB.
+
+**Fuente del fabricante:** ABB `3HAC035960-005`, revisión W, sección 1.8.3, página 40.
+
+La sincronización de seis articulaciones y la organización del módulo Python son decisiones técnicas del equipo para integrar LSPB con Pieper, FK y los análisis posteriores de Jacobiano y dinámica.
+
+
+## 13. Implementación y validación de LSPB
+
+### 13.1. Objetivo
+
+El módulo `src/lspb.py` implementa planificación temporal articular mediante Linear Segment with Parabolic Blends (LSPB), para movimientos punto a punto con velocidad inicial y final nula.
+
+Admite perfiles de una articulación (1R) y de seis articulaciones (6R), utilizando una duración total común en el caso 6R.
+
+### 13.2. Interfaz implementada
+
+La función principal es:
+
+```python
+planificar_lspb(
+    q_inicio,
+    q_final,
+    tf,
+    aceleraciones,
+    *,
+    velocidades_maximas=None,
+)
+```
+
+Las entradas son:
+
+- `q_inicio`: vector de posiciones articulares iniciales, en radianes.
+- `q_final`: vector de posiciones articulares finales, en radianes.
+- `tf`: duración total positiva, en segundos.
+- `aceleraciones`: magnitudes positivas de aceleración elegidas para planificación, en rad/s².
+- `velocidades_maximas`: cotas positivas opcionales de velocidad, en rad/s.
+
+Los vectores deben contener exactamente uno o seis elementos.
+
+En el caso 6R se aplican obligatoriamente los límites nominales de posición y velocidad ABB documentados en las secciones 10 y 12. Las cotas opcionales de velocidad pueden restringir esos valores, pero no ampliarlos.
+
+En el caso 1R no se atribuyen límites físicos al fabricante; se utilizan las restricciones explícitamente suministradas.
+
+La función devuelve un objeto `PerfilLSPB` con:
+
+- `q_inicio` y `q_final`.
+- `tf`.
+- `aceleraciones`.
+- `tc`: tiempos de mezcla.
+- `v_crucero`: velocidades de crucero con signo.
+- `velocidades_maximas`: cotas efectivas.
+
+### 13.3. Evaluación de la trayectoria
+
+El método:
+
+```python
+perfil.evaluar(t)
+```
+
+admite un instante escalar o un vector unidimensional de instantes dentro del intervalo `[0, tf]`.
+
+Devuelve un objeto `MuestraLSPB` con:
+
+- `q`: posiciones articulares.
+- `qdot`: velocidades articulares.
+- `qddot`: aceleraciones articulares.
+
+Para un instante escalar, cada salida tiene dimensión `(n,)`.
+
+Para `N` instantes, cada salida tiene dimensión `(N, n)`, donde `n` es 1 o 6.
+
+### 13.4. Fundamento matemático
+
+Para cada articulación:
+
+\[
+\Delta q_i=q_{final,i}-q_{inicio,i}
+\]
+
+La magnitud de aceleración requerida para que exista un perfil LSPB de reposo a reposo con duración `tf` satisface:
+
+\[
+a_i\geq\frac{4|\Delta q_i|}{t_f^2}
+\]
+
+Cuando se cumple la condición, el tiempo de mezcla se obtiene mediante:
+
+\[
+t_{c,i}=
+\frac{
+t_f-\sqrt{t_f^2-4|\Delta q_i|/a_i}
+}{2}
+\]
+
+La implementación utiliza una forma algebraicamente equivalente para mejorar la estabilidad numérica.
+
+La velocidad de crucero con signo es:
+
+\[
+v_{c,i}=\operatorname{sgn}(\Delta q_i)\,a_i t_{c,i}
+\]
+
+El módulo contempla:
+
+- Perfil trapezoidal: existe un intervalo de velocidad constante.
+- Perfil triangular: el intervalo de velocidad constante tiene duración nula.
+- Desplazamiento nulo: la articulación permanece inmóvil.
+- Desplazamiento negativo: se invierte el signo de la velocidad y de la aceleración correspondiente.
+
+### 13.5. Comprobación de factibilidad
+
+La implementación rechaza entradas inválidas o perfiles inviables mediante `ValueError`.
+
+Se comprueba:
+
+1. Dimensiones y finitud de los vectores.
+2. Duración total estrictamente positiva.
+3. Magnitudes de aceleración positivas.
+4. Factibilidad del desplazamiento con la aceleración y duración suministradas.
+5. Cumplimiento de límites de velocidad.
+6. Cumplimiento de límites nominales de posición ABB en los extremos para 6R.
+7. Validez de los instantes solicitados para evaluación.
+
+No se calcula automáticamente una nueva duración cuando el perfil resulta inviable: debe suministrarse otra combinación de parámetros.
+
+Las trayectorias son monótonas entre sus posiciones extremas por articulación. Por ello, si los extremos cumplen los límites nominales de posición, los puntos intermedios también permanecen dentro de dichos rangos.
+
+### 13.6. Validación con el ejemplo docente
+
+El ejemplo 1R de W09-S01 utiliza:
+
+\[
+q_i=0,\quad q_f=2\ \mathrm{rad},\quad
+t_f=3\ \mathrm{s},\quad a=1\ \mathrm{rad/s^2}
+\]
+
+Resultados:
+
+\[
+t_c=1\ \mathrm{s},\qquad
+v_c=1\ \mathrm{rad/s}
+\]
+
+La prueba automatizada verifica las posiciones y velocidades en siete instantes de la trayectoria.
+
+Se comprueban adicionalmente la transición triangular, desplazamientos negativos, desplazamientos nulos y discontinuidades de aceleración en los cambios de fase.
+
+### 13.7. Integración con Pieper
+
+La prueba `test_integracion_fk_pieper_seleccion_y_lspb` ejecuta el siguiente procedimiento:
+
+1. Construir una pose objetivo mediante FK.
+2. Resolver la cinemática inversa utilizando Pieper.
+3. Filtrar y seleccionar una configuración que cumpla límites ABB.
+4. Planificar una trayectoria LSPB desde la configuración inicial hasta la configuración seleccionada.
+5. Evaluar las posiciones articulares a lo largo del intervalo.
+6. Comprobar que el punto final coincide con la configuración seleccionada.
+7. Comprobar mediante FK que la pose final coincide con la pose objetivo.
+
+La prueba utiliza una duración de 8 segundos y aceleraciones de planificación de 1 rad/s² en las seis articulaciones. Estos valores corresponden exclusivamente al caso de prueba y no a especificaciones del fabricante.
+
+### 13.8. Resultados de validación
+
+El 13 de octubre de 2026 se ejecutó:
+
+```bash
+python -m unittest discover -s validacion -p "test_*.py" -v
+```
+
+Resultado:
+
+- FK: 4 pruebas satisfactorias.
+- Pieper: 7 pruebas satisfactorias.
+- Límites ABB: 6 pruebas satisfactorias.
+- Selección: 7 pruebas satisfactorias.
+- LSPB: 14 pruebas satisfactorias.
+
+**Total: 38 pruebas satisfactorias, 0 fallidas.**
+
+### 13.9. Limitaciones
+
+El perfil LSPB parte del reposo y termina en reposo.
+
+La aceleración es constante por tramos y presenta discontinuidades en los cambios de fase. No se modela la limitación de jerk.
+
+No se verifican colisiones, torques, cargas dinámicas, consumo energético ni restricciones particulares de un controlador real.
+
+Los valores de aceleración son parámetros académicos suministrados por el equipo. El cumplimiento de límites nominales de velocidad ABB no demuestra por sí mismo factibilidad dinámica o seguridad de ejecución.
+
+### 13.10. Fuentes y evidencias
+
+**Material académico:** `S09_material_oficial.pdf`, W09-S01, diapositivas 8–10, correspondientes a generación de trayectorias LSPB y ejemplo guiado.
+
+**Fabricante:** ABB, *Especificaciones del producto — IRB 120*, `3HAC035960-005`, revisión W, sección 1.8.3, página impresa 40.
+
+**Código:** `src/lspb.py`.
+
+**Pruebas:** `validacion/test_lspb.py`.
+
+**Integración:** `src/irb120_fk.py`, `src/pieper.py`, `src/seleccion_pieper.py`.
