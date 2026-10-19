@@ -469,3 +469,92 @@ Entre ellas se verificó la integración FK → Pieper → selección articular 
 - `docs/arquitectura_y_convenciones.md`, secciones 12 y 13.
 - `src/lspb.py`.
 - `validacion/test_lspb.py`.
+
+
+## 9. Diagrama específico: Jacobiano geométrico del ABB IRB 120
+
+Este diagrama describe el procedimiento implementado en `src/jacobiano.py`.
+
+El cálculo utiliza D-H estándar, las transformaciones del modelo del Hito 1 y las convenciones articulares documentadas en `arquitectura_y_convenciones.md`, sección 14.
+
+```mermaid
+flowchart TD
+    A["Recibir q y target_frame"]
+    B["Validar seis valores articulares finitos"]
+    C{"¿Frame flange o tcp?"}
+    D["Construir parametros DH, incluido offset J2"]
+    E["Calcular transformaciones 0T0 hasta 0T6"]
+    F{"¿Se solicita TCP?"}
+    G["Aplicar transformacion fija 6Ttcp"]
+    H["Conservar pose de brida 0T6"]
+    I["Obtener posicion del efector en marco 0"]
+    J["Recorrer las seis juntas revolutas"]
+    K["Extraer eje z y origen del frame anterior"]
+    L["Calcular Jv = z cruz (pe - o)"]
+    M["Calcular Jw = z"]
+    N["Ensamblar columna del Jacobiano"]
+    O{"¿Quedan juntas?"}
+    P["Devolver matriz J de 6 por 6"]
+    Q["Si se recibe qdot, calcular J por qdot"]
+    R["Devolver velocidad lineal y angular"]
+    X["Rechazar entrada invalida"]
+
+    A --> B --> C
+    C -->|No valido| X
+    C -->|Valido| D --> E --> F
+    F -->|Si| G --> I
+    F -->|No| H --> I
+    I --> J --> K --> L --> M --> N --> O
+    O -->|Si| J
+    O -->|No| P
+    P --> Q --> R
+```
+
+### Convenciones
+
+El Jacobiano geométrico expresa todas sus componentes en el marco base `{0}`:
+
+\[
+{}^0V_e={}^0J(q)\dot q
+\]
+
+Para una articulación revoluta:
+
+\[
+{}^0J_i=
+\begin{bmatrix}
+{}^0z_{i-1}\times({}^0p_e-{}^0o_{i-1})\\
+{}^0z_{i-1}
+\end{bmatrix}
+\]
+
+La salida `J(q)` es una matriz de dimensión 6×6: velocidad lineal en las primeras tres filas y velocidad angular en las últimas tres filas.
+
+### Validación
+
+La implementación se verificó mediante:
+
+- Cálculo manual de las columnas J1 y J2 en la configuración cero.
+- Comparación de las transformaciones intermedias con FK.
+- Validación numérica mediante diferencias finitas de posición y orientación.
+- Comparación de velocidades cartesianas con derivadas numéricas de FK.
+- Comprobación de brida y TCP.
+- Validación de entradas inválidas.
+
+La batería completa del Hito 2 produjo 47 pruebas satisfactorias, incluidas nueve del Jacobiano.
+
+### Alcance y limitaciones
+
+El módulo calcula el Jacobiano geométrico y permite obtener la velocidad cartesiana a partir de las velocidades articulares.
+
+No determina todavía el rango ni clasifica singularidades. Esas operaciones corresponden a un experimento computacional independiente.
+
+La aproximación a una singularidad, la pérdida de movilidad y la amplificación de velocidades articulares se estudiarán en el siguiente módulo.
+
+### Referencias
+
+- `S10_material_oficial.pdf`, `hito_2_guia.pdf`, página 31.
+- `S10_material_oficial.pdf`, `hito_2_rubrica.pdf`, página 35.
+- `docs/arquitectura_y_convenciones.md`, sección 14.
+- `src/jacobiano.py`.
+- `validacion/test_jacobiano.py`.

@@ -698,3 +698,157 @@ Los valores de aceleración son parámetros académicos suministrados por el equ
 **Pruebas:** `validacion/test_lspb.py`.
 
 **Integración:** `src/irb120_fk.py`, `src/pieper.py`, `src/seleccion_pieper.py`.
+
+
+## 14. Implementación y validación del Jacobiano geométrico
+
+### 14.1. Fundamento académico
+
+**Fuente oficial:** `S10_material_oficial.pdf`, documento `hito_2_guia.pdf`, página 31; documento `hito_2_rubrica.pdf`, página 35.
+
+El Hito 2 requiere implementar el Jacobiano geométrico, relacionar velocidades articulares y cartesianas, validar matemáticamente al menos un caso y utilizar el rango matricial para diagnosticar singularidades.
+
+La implementación corresponde al ABB IRB 120 con las convenciones D-H estándar reutilizadas del Hito 1.
+
+### 14.2. Definición y marcos
+
+El Jacobiano geométrico cumple:
+
+\[
+{}^0V_e=
+\begin{bmatrix}
+{}^0v_e\\
+{}^0\omega_e
+\end{bmatrix}
+=
+{}^0J(q)\dot q
+\]
+
+El Jacobiano tiene dimensión 6×6.
+
+Las tres primeras filas corresponden a velocidad lineal, en m/s, y las tres últimas a velocidad angular, en rad/s.
+
+Todas las componentes se expresan respecto al marco base `{0}`.
+
+Para cada junta revoluta:
+
+\[
+{}^0J_i=
+\begin{bmatrix}
+{}^0z_{i-1}\times({}^0p_e-{}^0o_{i-1})\\
+{}^0z_{i-1}
+\end{bmatrix}
+\]
+
+Los vectores de ejes, orígenes y posición del efector se expresan en el mismo marco.
+
+### 14.3. Implementación
+
+Archivo: `src/jacobiano.py`.
+
+Funciones implementadas:
+
+- `transformaciones_intermedias(q)`: devuelve las transformaciones homogéneas desde `0T0` hasta `0T6`, calculadas mediante D-H estándar.
+- `jacobiano_geometrico(q, target_frame="flange")`: construye el Jacobiano geométrico 6×6 para la brida o el TCP.
+- `velocidad_cartesiana(q, qdot, target_frame="flange")`: calcula la velocidad lineal y angular del efector mediante la multiplicación del Jacobiano por el vector de velocidades articulares.
+
+El cálculo reutiliza `dh_matrix`, `irb120_dh_params` y `tcp_transform`.
+
+El offset \(\theta_2=q_2-\pi/2\) está incorporado mediante `irb120_dh_params`.
+
+No se modifica la implementación original de FK.
+
+### 14.4. Validación manual: configuración cero
+
+Para:
+
+\[
+q=[0,0,0,0,0,0]^T
+\]
+
+La posición de la brida en el marco base es:
+
+\[
+{}^0p_6=[0.374,0,0.630]^T\ \mathrm{m}
+\]
+
+**Primera articulación:**
+
+\[
+{}^0z_0=[0,0,1]^T,\qquad {}^0o_0=[0,0,0]^T
+\]
+
+\[
+{}^0J_1=[0,0.374,0,0,0,1]^T
+\]
+
+**Segunda articulación:**
+
+\[
+{}^0z_1=[0,1,0]^T,\qquad {}^0o_1=[0,0,0.290]^T
+\]
+
+\[
+{}^0J_2=[0.340,0,-0.374,0,1,0]^T
+\]
+
+Ambas columnas fueron comprobadas mediante pruebas automatizadas con tolerancia absoluta de `1e-12`.
+
+Son resultados derivados del modelo cinemático del equipo, no valores tabulados por el fabricante.
+
+### 14.5. Brida y TCP
+
+El Jacobiano admite los valores `target_frame="flange"` y `target_frame="tcp"`.
+
+Para la configuración cero, la componente lineal de J1 cambia de 0.374 m a 0.494 m al trasladar el punto de evaluación desde la brida al TCP.
+
+La componente angular de J1 no cambia.
+
+La componente lineal de J6 es nula para la brida y el TCP académico utilizado, porque ambos puntos están sobre el eje de rotación de J6.
+
+### 14.6. Validación numérica independiente
+
+La prueba `test_diferencias_finitas_posicion_y_angular` compara las columnas del Jacobiano con aproximaciones numéricas obtenidas mediante diferencias finitas centradas de la FK.
+
+Se evalúan tres configuraciones articulares, tanto para la brida como para el TCP.
+
+La derivada posicional se aproxima mediante:
+
+\[
+\frac{\partial p_e}{\partial q_i}
+\approx
+\frac{p_e(q+h e_i)-p_e(q-h e_i)}{2h}
+\]
+
+con \(h=10^{-6}\) rad.
+
+La parte angular se verifica a partir de la derivada de la matriz de rotación y la relación entre \(\dot R R^T\) y la matriz antisimétrica de velocidad angular.
+
+Se utiliza tolerancia absoluta de `2e-8` para las comprobaciones de columnas.
+
+También se compara `velocidad_cartesiana` con una derivada numérica de FK, utilizando velocidades articulares no nulas.
+
+### 14.7. Resultados de pruebas
+
+En la ejecución del 18 de octubre de 2026:
+
+- FK: 4 pruebas satisfactorias.
+- Jacobiano: 9 pruebas satisfactorias.
+- Límites ABB: 6 pruebas satisfactorias.
+- Pieper: 7 pruebas satisfactorias.
+- Selección: 7 pruebas satisfactorias.
+- LSPB: 14 pruebas satisfactorias.
+
+**Total: 47 pruebas satisfactorias, 0 fallidas.**
+
+Archivo de pruebas del módulo: `validacion/test_jacobiano.py`.
+
+### 14.8. Limitaciones y trabajo pendiente
+
+El módulo calcula el Jacobiano geométrico y la velocidad cartesiana, pero todavía no realiza el análisis de singularidades.
+
+Está pendiente implementar un experimento computacional independiente que aproxime una configuración singular conocida, registre la pérdida de rango y permita interpretar físicamente la movilidad perdida.
+
+También queda pendiente integrar la evaluación de velocidades cartesianas a lo largo de una trayectoria LSPB dentro del Notebook final.
+
+Los criterios numéricos, tolerancias y procedimientos de validación complementarios utilizados por el equipo no deben atribuirse al fabricante ni al docente cuando no estén establecidos expresamente en sus documentos.
