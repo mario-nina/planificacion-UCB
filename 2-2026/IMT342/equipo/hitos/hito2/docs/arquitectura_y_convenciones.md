@@ -1020,3 +1020,212 @@ La interpretación se limita a la configuración y consigna estudiadas. No se af
 **Pruebas:** `validacion/test_singularidades.py`.
 
 **Dependencia matemática:** `src/jacobiano.py`.
+
+
+## 16. Dinámica reducida 1R y cálculo de torque
+
+### 16.1. Fundamento académico
+
+**Fuentes oficiales:**
+
+- `S10_material_oficial.pdf`, `hito_2_guia.pdf`, página 31.
+- `S10_material_oficial.pdf`, `hito_2_rubrica.pdf`, página 35.
+- `S10_material_oficial.pdf`, solucionario W10-S01, página 17.
+
+El docente establece que el componente dinámico del Hito 2 debe utilizar el modelo reducido 1R estudiado en clase, alimentado con una trayectoria LSPB.
+
+No se exige la identificación dinámica completa de los seis grados de libertad del ABB IRB 120.
+
+### 16.2. Modelo matemático
+
+Se adopta un modelo revoluto de un grado de libertad, con ángulo medido desde la vertical inferior y momento de inercia constante:
+
+\[
+J_{1R}=I_c+m\ell_c^2
+\]
+
+Su energía cinética es:
+
+\[
+T=\frac12J_{1R}\dot q^2
+\]
+
+Su energía potencial es:
+
+\[
+V=mg\ell_c(1-\cos q)
+\]
+
+A partir de la formulación de Euler-Lagrange se obtiene:
+
+\[
+\tau(t)=J_{1R}\ddot q(t)+mg\ell_c\sin(q(t))
+\]
+
+Se distinguen:
+
+\[
+\tau_{\mathrm{inercial}}(t)=J_{1R}\ddot q(t)
+\]
+
+\[
+\tau_{\mathrm{gravitatorio}}(t)=mg\ell_c\sin(q(t))
+\]
+
+\[
+\tau_{\mathrm{total}}(t)=
+\tau_{\mathrm{inercial}}(t)+\tau_{\mathrm{gravitatorio}}(t)
+\]
+
+El modelo particular posee inercia constante y no incluye un término independiente de Coriolis o centrífugo.
+
+Esta simplificación no representa el acoplamiento dinámico del manipulador ABB IRB 120 de seis grados de libertad.
+
+### 16.3. Implementación
+
+**Archivo:** `src/dinamica_1r.py`.
+
+La estructura `ParametrosDinamica1R` almacena:
+
+- `inercia_kg_m2`: inercia escalar \(J_{1R}\), en kg·m².
+- `masa_kg`: masa del modelo pedagógico, en kg.
+- `longitud_cm_m`: distancia al centro de masa, en m.
+- `gravedad_m_s2`: aceleración de gravedad, en m/s².
+
+La función `evaluar_dinamica_1r()` recibe un objeto `PerfilLSPB` existente, los tiempos de evaluación y los parámetros dinámicos.
+
+Devuelve una `MuestraDinamica1R` con:
+
+- `t_s`
+- `q_rad`
+- `qdot_rad_s`
+- `qddot_rad_s2`
+- `tau_inercial_nm`
+- `tau_gravitatorio_nm`
+- `tau_total_nm`
+- `indice_articulacion`
+
+Se admiten instantes individuales y vectores de tiempos.
+
+Para perfiles LSPB de seis articulaciones es obligatorio identificar explícitamente qué señal articular alimentará el modelo 1R. Esto no convierte el resultado en una predicción física del torque de esa junta ABB.
+
+### 16.4. Caso de validación oficial
+
+Se utiliza el ejemplo del solucionario W10-S01:
+
+\[
+q_i=0,\quad q_f=2\ \mathrm{rad}
+\]
+
+\[
+t_f=3\ \mathrm{s},\quad
+|\ddot q_c|=1\ \mathrm{rad/s^2}
+\]
+
+Los parámetros didácticos son:
+
+\[
+J_{1R}=0.25\ \mathrm{kg\,m^2}
+\]
+
+\[
+m=1\ \mathrm{kg},\quad
+\ell_c=0.5\ \mathrm m,\quad
+g=9.81\ \mathrm{m/s^2}
+\]
+
+Para \(t=2.5\ \mathrm s\):
+
+\[
+q=1.875\ \mathrm{rad},\quad
+\dot q=0.5\ \mathrm{rad/s},\quad
+\ddot q=-1\ \mathrm{rad/s^2}
+\]
+
+Entonces:
+
+\[
+\tau_{\mathrm{inercial}}=-0.25\ \mathrm{N\,m}
+\]
+
+\[
+\tau_{\mathrm{gravitatorio}}=
+4.905\sin(1.875)\ \mathrm{N\,m}
+\]
+
+\[
+\tau_{\mathrm{total}}\approx4.43\ \mathrm{N\,m}
+\]
+
+La implementación reproduce el resultado del ejercicio oficial.
+
+Los valores de masa e inercia son exclusivamente pedagógicos y no deben atribuirse al fabricante ABB.
+
+### 16.5. Interpretación de las fases LSPB
+
+Durante la aceleración, la contribución inercial tiene el signo de la aceleración articular.
+
+Durante el crucero, la aceleración es nula y, por tanto:
+
+\[
+\tau_{\mathrm{inercial}}=0
+\]
+
+Sin embargo, el torque gravitatorio puede continuar siendo distinto de cero.
+
+Durante el frenado, la aceleración cambia de signo y también lo hace la contribución inercial.
+
+El modelo LSPB ideal permite discontinuidades de aceleración en las fronteras de fase. Por esta razón, el torque inercial puede presentar saltos en dichos instantes.
+
+### 16.6. Pruebas automatizadas
+
+**Archivo:** `validacion/test_dinamica_1r.py`.
+
+Se verificaron:
+
+- El ejemplo numérico oficial del docente.
+- La evaluación de las tres fases LSPB.
+- Torque gravitatorio durante velocidad constante.
+- Movimiento en sentido negativo.
+- Casos de gravedad nula y movimiento estacionario.
+- Evaluación escalar y vectorial.
+- Selección explícita de una señal articular de un perfil 6R.
+- Rechazo de parámetros e índices inválidos.
+- Conservación de las entradas originales.
+
+La ejecución completa del 19 de octubre de 2026 finalizó con 71 pruebas satisfactorias, incluidas 14 del módulo de dinámica reducida 1R.
+
+### 16.7. Evidencia gráfica generada
+
+El 19 de octubre de 2026 se generaron evidencias reproducibles utilizando `evidencias/generar_graficas_dinamica_1r.py`, que reutiliza los módulos `src/lspb.py` y `src/dinamica_1r.py`.
+
+Los parámetros utilizados corresponden al ejercicio didáctico oficial W10-S01, no a datos dinámicos reales del ABB IRB 120.
+
+**Archivos generados:**
+
+- `evidencias/figuras/01_perfiles_lspb_1r.png`: perfiles de posición, velocidad y aceleración.
+- `evidencias/figuras/02_torques_componentes_1r.png`: componentes inercial y gravitatoria del torque.
+- `evidencias/figuras/03_torque_total_1r.png`: evolución temporal del torque total.
+- `evidencias/figuras/dinamica_1r_datos.csv`: resultados numéricos reproducibles.
+
+**Resultados de comprobación:**
+
+- Tiempo total LSPB: 3 s.
+- Tiempo de mezcla: 1 s.
+- Torque total en t = 2.5 s: 4.429791 N·m.
+- Durante el crucero, en t = 1.5 s, el torque inercial es 0 N·m y el gravitatorio es 4.127415 N·m.
+- Mayor magnitud de torque observada en la malla temporal: 4.890917 N·m, en t = 1.995 s.
+
+El máximo reportado es un valor muestreado, no una garantía de máximo global exacto. El perfil LSPB ideal presenta discontinuidades de aceleración en las fronteras de fase, que producen discontinuidades correspondientes en la contribución inercial del torque.
+
+La evidencia demuestra que velocidad articular constante no implica torque total nulo, debido a la componente gravitatoria.
+
+Los resultados pertenecen exclusivamente al modelo didáctico reducido 1R y no constituyen estimaciones físicas de los torques de los actuadores ABB.
+
+### 16.8. Limitaciones
+
+El modelo no incorpora acoplamiento entre articulaciones, términos completos de Coriolis, efectos centrífugos, fricción ni cargas externas.
+
+Los resultados no constituyen una estimación certificada de torque de los motores del ABB IRB 120.
+
+La dinámica reducida 1R satisface el alcance pedagógico establecido expresamente por el docente para este Hito 2.

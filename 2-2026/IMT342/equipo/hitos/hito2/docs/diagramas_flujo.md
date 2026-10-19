@@ -640,3 +640,105 @@ La batería completa del Hito 2 ejecutó satisfactoriamente 57 pruebas, incluida
 - `src/singularidades.py`.
 - `validacion/test_singularidades.py`.
 - `evidencias/README.md`.
+
+
+## 11. Diagrama específico: dinámica reducida 1R y torque
+
+Este diagrama describe el procedimiento implementado en `src/dinamica_1r.py`, que utiliza los perfiles temporales generados por `src/lspb.py`.
+
+El modelo corresponde a la dinámica didáctica reducida 1R establecida por el docente para el Hito 2.
+
+```mermaid
+flowchart TD
+    A["Recibir perfil LSPB, tiempos y parámetros dinámicos"]
+    B["Validar parámetros y unidades"]
+    C{"¿Perfil LSPB de 1R o 6R?"}
+    D["Usar la única articulación del perfil 1R"]
+    E["Exigir selección explícita de articulación para perfil 6R"]
+    F["Evaluar q, qdot y qddot mediante LSPB"]
+    G["Extraer la señal articular seleccionada"]
+    H["Calcular torque inercial J1R por qddot"]
+    I["Calcular torque gravitatorio m g lc sin q"]
+    J["Sumar componentes para obtener torque total"]
+    K["Devolver variables cinemáticas y torques"]
+    L["Generar datos y gráficas reproducibles"]
+    M["Interpretar aceleración, crucero y frenado"]
+    X["Rechazar parámetros o selección inválidos"]
+
+    A --> B --> C
+    B -->|Inválidos| X
+    C -->|1R| D --> F
+    C -->|6R| E
+    E -->|Selección válida| F
+    E -->|Selección inválida| X
+    F --> G --> H --> I --> J --> K --> L --> M
+```
+
+### Fundamento matemático
+
+La dinámica reducida 1R se modela mediante:
+
+\[
+\tau(t)=J_{1R}\ddot q(t)+mg\ell_c\sin(q(t))
+\]
+
+El torque inercial es:
+
+\[
+\tau_{\mathrm{inercial}}(t)=J_{1R}\ddot q(t)
+\]
+
+El torque gravitatorio es:
+
+\[
+\tau_{\mathrm{gravitatorio}}(t)=mg\ell_c\sin(q(t))
+\]
+
+El torque total corresponde a la suma de ambas contribuciones.
+
+### Interpretación del perfil LSPB
+
+Durante la aceleración, el torque inercial tiene el signo de la aceleración.
+
+Durante el crucero, la aceleración es nula, pero puede existir torque gravitatorio.
+
+Durante el frenado, cambia el signo de la aceleración y, con ello, la contribución inercial.
+
+Las discontinuidades de aceleración del LSPB ideal pueden producir saltos en el torque inercial.
+
+### Validación numérica
+
+Se empleó el ejercicio oficial W10-S01 con los siguientes parámetros didácticos:
+
+- Inercia equivalente: 0.25 kg·m².
+- Masa: 1 kg.
+- Distancia al centro de masa: 0.5 m.
+- Gravedad: 9.81 m/s².
+- Desplazamiento: 0 a 2 rad.
+- Tiempo total: 3 s.
+- Aceleración: 1 rad/s².
+
+Para t = 2.5 s se obtuvo un torque de 4.429791 N·m, consistente con el solucionario del docente.
+
+La batería completa del Hito 2 ejecutó satisfactoriamente 71 pruebas, incluidas 14 específicas del módulo de dinámica reducida 1R.
+
+### Evidencias reproducibles
+
+El script `evidencias/generar_graficas_dinamica_1r.py` produce:
+
+- `evidencias/figuras/01_perfiles_lspb_1r.png`
+- `evidencias/figuras/02_torques_componentes_1r.png`
+- `evidencias/figuras/03_torque_total_1r.png`
+- `evidencias/figuras/dinamica_1r_datos.csv`
+
+Los resultados corresponden a un modelo pedagógico de un grado de libertad. No representan los torques reales de los seis actuadores del ABB IRB 120.
+
+### Referencias
+
+- `S10_material_oficial.pdf`, guía del Hito 2, página 31.
+- `S10_material_oficial.pdf`, solucionario W10-S01, página 17.
+- `docs/arquitectura_y_convenciones.md`, sección 16.
+- `src/lspb.py`.
+- `src/dinamica_1r.py`.
+- `validacion/test_dinamica_1r.py`.
+- `evidencias/README_dinamica_1r.md`.
