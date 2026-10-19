@@ -852,3 +852,171 @@ Está pendiente implementar un experimento computacional independiente que aprox
 También queda pendiente integrar la evaluación de velocidades cartesianas a lo largo de una trayectoria LSPB dentro del Notebook final.
 
 Los criterios numéricos, tolerancias y procedimientos de validación complementarios utilizados por el equipo no deben atribuirse al fabricante ni al docente cuando no estén establecidos expresamente en sus documentos.
+
+
+## 15. Experimento independiente de singularidad de muñeca
+
+### 15.1. Fundamento y requisitos oficiales
+
+**Fuentes docentes:**
+
+- `S10_material_oficial.pdf`, `hito_2_guia.pdf`, página 31.
+- `S10_material_oficial.pdf`, `hito_2_rubrica.pdf`, página 35.
+
+La guía exige un experimento independiente de aproximación a una singularidad conocida, demostración de pérdida de rango, representación gráfica, interpretación física de la movilidad perdida y análisis de la amplificación de velocidades articulares.
+
+### 15.2. Configuración estudiada
+
+Se utiliza el ABB IRB 120 con su modelo D-H estándar.
+
+La configuración de referencia del experimento es:
+
+\[
+q_{\mathrm{ref}}=
+[0.30,-0.35,0.25,0.40,0,-0.60]^T
+\quad\mathrm{rad}
+\]
+
+Se mantienen constantes las articulaciones J1, J2, J3, J4 y J6, mientras J5 se aproxima a cero desde valores positivos.
+
+Cuando \(q_5=0\), los ejes de J4 y J6 se alinean y sus columnas del Jacobiano geométrico se vuelven dependientes.
+
+La configuración se eligió para estudiar la singularidad de muñeca. No representa una consigna de movimiento físico del robot.
+
+### 15.3. Módulo implementado
+
+Archivo: `src/singularidades.py`.
+
+Funciones principales:
+
+- `analizar_singularidad(q, ...)`: calcula el rango, los valores singulares, el número de condición y las direcciones singulares asociadas.
+- `experimento_singularidad_muneca(...)`: construye una secuencia descendente de ángulos J5, evalúa el Jacobiano y estudia la velocidad articular requerida por una consigna cartesiana fija.
+
+Las funciones admiten la evaluación en la brida o en el TCP.
+
+### 15.4. Criterio de rango
+
+Se utiliza la descomposición en valores singulares (SVD) de una matriz Jacobiana normalizada:
+
+\[
+J_n =
+\operatorname{diag}
+\left(\frac1L,\frac1L,\frac1L,1,1,1\right)J
+\]
+
+La longitud de referencia predeterminada es:
+
+\[
+L=1\ \mathrm m
+\]
+
+La normalización permite comparar las componentes lineales y angulares mediante una convención de escala explícita.
+
+**Importante:** esta longitud es una decisión numérica del equipo. No es una dimensión del fabricante ni modifica el rango exacto del Jacobiano.
+
+El rango numérico se calcula contando los valores singulares que satisfacen:
+
+\[
+\sigma_i>\varepsilon_{\mathrm{rel}}\sigma_{\max}
+\]
+
+con tolerancia relativa predeterminada:
+
+\[
+\varepsilon_{\mathrm{rel}}=10^{-9}
+\]
+
+El criterio principal de singularidad es:
+
+\[
+\operatorname{rank}(J)<6
+\]
+
+### 15.5. Movilidad perdida
+
+En la singularidad \(q_5=0\), el Jacobiano presenta rango 5 para la configuración estudiada.
+
+La SVD permite identificar:
+
+- Una dirección normalizada del espacio cartesiano que queda fuera de la imagen del Jacobiano.
+- Un modo articular nulo, correspondiente a una combinación de velocidades articulares que no produce velocidad instantánea del efector.
+
+La dirección cartesiana perdida no debe interpretarse automáticamente como un eje puro de traslación o rotación: puede combinar componentes lineales y angulares.
+
+### 15.6. Amplificación de velocidades
+
+Para estudiar la proximidad a la singularidad se construye una única consigna cartesiana fija, elegida a partir de la dirección izquierda nula del Jacobiano singular.
+
+En configuraciones de rango completo se resuelve:
+
+\[
+J(q)\dot q=V_d
+\]
+
+Se registra:
+
+\[
+\|\dot q\|_2
+\]
+
+para cada valor de \(q_5\).
+
+Al acercarse a la singularidad, las velocidades articulares necesarias para satisfacer esa consigna pueden aumentar considerablemente.
+
+En \(q_5=0\), el programa no intenta invertir el Jacobiano singular. Registra la pérdida de rango, el error asociado a la dirección no alcanzable y un valor no definido (`NaN`) para la norma de velocidad articular requerida.
+
+Las velocidades calculadas son exclusivamente resultados matemáticos. No se verifican como comandos ejecutables ni se asegura su cumplimiento de límites ABB.
+
+### 15.7. Resultados de pruebas
+
+La ejecución completa del 19 de octubre de 2026 produjo:
+
+- 47 pruebas anteriores satisfactorias.
+- 10 pruebas nuevas de singularidades satisfactorias.
+
+**Total: 57 pruebas satisfactorias, 0 fallidas.**
+
+Las pruebas nuevas abarcan pérdida de rango, postura regular, alineación de ejes J4/J6, comportamiento de brida y TCP, dirección cartesiana no realizable, amplificación de velocidad, validación de entradas y conservación de datos.
+
+### 15.8. Evidencia gráfica generada
+
+El 19 de octubre de 2026 se generó evidencia gráfica reproducible a partir del experimento implementado en `src/singularidades.py`.
+
+La generación se realizó mediante el script:
+
+- `evidencias/generar_graficas_singularidad.py`
+
+Este procedimiento produjo los siguientes archivos:
+
+1. `evidencias/figuras/01_rango_jacobiano.png`
+2. `evidencias/figuras/02_valor_singular_minimo.png`
+3. `evidencias/figuras/03_amplificacion_velocidades.png`
+4. `evidencias/figuras/singularidad_muneca_datos.csv`
+
+Las figuras representan:
+
+- la evolución del rango numérico del Jacobiano al aproximarse a la singularidad;
+- el comportamiento del menor valor singular;
+- la amplificación de la norma de velocidad articular requerida para una consigna cartesiana fija.
+
+El archivo CSV conserva los datos numéricos utilizados para construir las gráficas y permite reproducir el análisis sin depender únicamente de las imágenes.
+
+La ejecución del script informó explícitamente que las velocidades calculadas no deben interpretarse como comandos admisibles para el robot real.
+
+Estas evidencias complementan las pruebas automatizadas del módulo y satisfacen el requisito de conservar una demostración gráfica reproducible del fenómeno estudiado.
+
+### 15.9. Limitaciones
+
+El estudio corresponde a una trayectoria de configuraciones para diagnóstico y no a una trayectoria temporal ejecutable.
+
+La singularidad cinemática no implica por sí misma torque infinito.
+
+El rango numérico depende de una tolerancia declarada. Los valores singulares dependen de la convención de escala utilizada.
+
+La interpretación se limita a la configuración y consigna estudiadas. No se afirma que cualquier velocidad cartesiana produzca amplificación ni que toda singularidad del ABB IRB 120 sea de muñeca.
+
+**Código:** `src/singularidades.py`.
+
+**Pruebas:** `validacion/test_singularidades.py`.
+
+**Dependencia matemática:** `src/jacobiano.py`.

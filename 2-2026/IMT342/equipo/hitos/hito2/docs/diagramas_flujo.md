@@ -558,3 +558,85 @@ La aproximación a una singularidad, la pérdida de movilidad y la amplificació
 - `docs/arquitectura_y_convenciones.md`, sección 14.
 - `src/jacobiano.py`.
 - `validacion/test_jacobiano.py`.
+
+
+## 10. Diagrama específico: singularidad de muñeca del ABB IRB 120
+
+El diagrama representa el experimento independiente implementado en `src/singularidades.py`, a partir del Jacobiano geométrico de `src/jacobiano.py`.
+
+Se estudia la aproximación hacia \(q_5=0\), manteniendo constantes las demás articulaciones.
+
+```mermaid
+flowchart TD
+    A["Recibir configuración de referencia y parámetros"]
+    B["Validar entradas, límites ABB y secuencia q5"]
+    C["Construir configuración singular con q5 igual a cero"]
+    D["Calcular Jacobiano normalizado y SVD"]
+    E{"¿Rango singular igual a 5?"}
+    X["Rechazar experimento no válido"]
+    F["Identificar dirección cartesiana perdida"]
+    G["Construir consigna cartesiana fija"]
+    H["Recorrer valores de q5"]
+    I["Calcular Jacobiano geométrico"]
+    J["Normalizar y calcular SVD y rango"]
+    K["Registrar rango, valor singular mínimo y condición"]
+    L{"¿Rango completo?"}
+    M["Resolver J qdot = consigna fija"]
+    N["Registrar norma de qdot y error"]
+    O["Registrar velocidad no definida y error no realizable"]
+    P{"¿Quedan configuraciones?"}
+    Q["Consolidar resultados numéricos"]
+    R["Exportar datos CSV"]
+    S["Generar tres gráficas"]
+    T["Interpretar pérdida de rango y amplificación"]
+
+    A --> B --> C --> D --> E
+    E -->|No| X
+    E -->|Sí| F --> G --> H --> I --> J --> K --> L
+    L -->|Sí| M --> N --> P
+    L -->|No| O --> P
+    P -->|Sí| H
+    P -->|No| Q --> R --> S --> T
+```
+
+### Criterio matemático
+
+Se utiliza el rango numérico del Jacobiano como criterio principal:
+
+\[
+\operatorname{rank}(J)<6
+\]
+
+Los valores singulares, el número de condición y los vectores singulares se calculan mediante SVD como herramientas complementarias.
+
+La componente lineal se normaliza mediante una longitud de referencia declarada de 1 m.
+
+### Interpretación física
+
+En la configuración estudiada, cuando \(q_5=0\), los ejes de las articulaciones J4 y J6 se alinean. El Jacobiano pasa de rango 6 a rango 5.
+
+La pérdida de rango representa una dirección independiente de velocidad cartesiana que el robot no puede generar instantáneamente.
+
+La consigna cartesiana se mantiene fija durante la aproximación. En las configuraciones regulares se resuelve el sistema de velocidades articulares. En la configuración singular no se intenta invertir el Jacobiano.
+
+Las velocidades calculadas tienen finalidad diagnóstica y no representan comandos admisibles para el ABB IRB 120.
+
+### Evidencias reproducibles
+
+El script `evidencias/generar_graficas_singularidad.py` genera:
+
+- `evidencias/figuras/01_rango_jacobiano.png`
+- `evidencias/figuras/02_valor_singular_minimo.png`
+- `evidencias/figuras/03_amplificacion_velocidades.png`
+- `evidencias/figuras/singularidad_muneca_datos.csv`
+
+La batería completa del Hito 2 ejecutó satisfactoriamente 57 pruebas, incluidas diez específicas del módulo de singularidades.
+
+### Referencias
+
+- `S10_material_oficial.pdf`, guía del Hito 2, página 31.
+- `S10_material_oficial.pdf`, rúbrica del Hito 2, página 35.
+- `docs/arquitectura_y_convenciones.md`, sección 15.
+- `src/singularidades.py`.
+- `validacion/test_singularidades.py`.
+- `evidencias/README.md`.
