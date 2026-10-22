@@ -1,744 +1,397 @@
-# Diagramas de flujo — Hito 2 ABB IRB 120
 
-Este documento representa la arquitectura funcional y los procesos generales de desarrollo y validación del Hito 2.
+# Diagramas de flujo — Hito 2
 
-Los diagramas describen el diseño previsto. No representan implementaciones terminadas ni resultados ya validados.
+## 1. Arquitectura general
 
-Los diagramas específicos de cada algoritmo se incorporarán conforme avance su desarrollo matemático y computacional.
-
-## 1. Arquitectura general del Hito 2
+El Hito 2 utiliza el modelo cinemático validado en el Hito 1 y desarrolla módulos independientes para cinemática inversa, planificación y análisis.
 
 ```mermaid
-flowchart TB
-    A["Hito 1: modelo D-H y FK validados"]
-    B["Copia controlada y documentada"]
-    C["Hito 2: base cinemática local"]
-
-    D["Algoritmos nuevos en src/"]
-    E["Notebook Jupyter"]
-    F["Pruebas y validaciones"]
-    G["Evidencias complementarias"]
-    H["Resultados para sustentación"]
+flowchart TD
+    A["Modelo D-H y FK del Hito 1"]
+    B["Módulos matemáticos en src/"]
+    C["Notebook integrador"]
+    D["Pruebas automatizadas"]
+    E["Figuras y resultados"]
+    F["Informe IEEE"]
 
     A --> B
     B --> C
-    C --> D
+    B --> D
+    C --> E
     D --> E
-    D --> F
-    E --> H
-    F --> H
-    G --> H
+    E --> F
 ```
 
-La cinemática directa se incorporará desde el Hito 1 mediante copia controlada, conservando la procedencia del código y sus convenciones geométricas.
-
-El Hito 2 se ejecutará utilizando sus propios archivos, sin depender de la carpeta del Hito 1.
-
-Los algoritmos se organizarán en módulos Python y se presentarán mediante un Notebook integrado.
+La implementación matemática reside en `src/`. El Notebook contiene los ensayos y resultados de integración.
 
 ## 2. Flujo funcional del Hito 2
 
 ```mermaid
-flowchart TB
-    A["Definir pose objetivo"]
-    B["Identificar marco: brida o TCP"]
-    C["Expresar objetivo en marco 6"]
-    D["Cinemática inversa analítica: Pieper"]
-    E["Generar y clasificar ramas"]
-    F["Verificar candidatas mediante FK"]
-    G{"¿Existe solución admisible?"}
-    H["Registrar imposibilidad o restricciones"]
-    I["Seleccionar configuración final"]
-    J["Definir configuración inicial y límites"]
-    K["Generar trayectoria LSPB"]
-    L["Calcular q(t), velocidad y aceleración"]
-    M["Evaluar Jacobiano y singularidades"]
-    N["Evaluar dinámica y torque"]
-    O["Gráficas, discusión y validación"]
-    P["Notebook integrado"]
+flowchart TD
+    A["Pose objetivo: brida o TCP"]
+    B["Conversión al marco de brida"]
+    C["Cinemática inversa de Pieper"]
+    D["Validación FK y límites ABB"]
+    E{"¿Existe solución admisible?"}
+    F["Registrar diagnóstico"]
+    G["Seleccionar configuración final"]
+    H["Planificar trayectoria LSPB"]
+    I["Evaluar Jacobiano y velocidades"]
+    J["Presentar gráficas y resultados"]
 
-    A --> B
-    B --> C
-    C --> D
-    D --> E
-    E --> F
-    F --> G
-    G -->|No| H
-    G -->|Sí| I
-    I --> J
-    J --> K
-    K --> L
-    L --> M
-    L --> N
-    M --> O
-    N --> O
-    O --> P
+    A --> B --> C --> D --> E
+    E -->|No| F
+    E -->|Sí| G --> H --> I --> J
 ```
 
-La transformación de la pose objetivo se realizará cuando sea necesario distinguir el TCP del marco terminal D-H.
+El análisis independiente de singularidades y el modelo académico de dinámica 1R complementan la evaluación principal.
 
-Las soluciones de Pieper se verificarán mediante la cinemática directa. No se supondrá que toda pose produce ocho soluciones físicas distintas y admisibles.
+## 3. Cinemática inversa analítica de Pieper
 
-El análisis de singularidades también incluirá experimentos específicos cuando la trayectoria LSPB elegida no atraviese una configuración singular.
-
-El modelo de torque deberá declarar sus parámetros físicos e hipótesis.
-
-## 3. Flujo de desarrollo y validación de un módulo
-
-```mermaid
-flowchart TB
-    A["Consultar requisito y fuente oficial"]
-    B["Estudiar fundamento matemático"]
-    C["Definir entradas, salidas y casos especiales"]
-    D["Diseñar algoritmo y diagrama específico"]
-    E["Implementar módulo Python"]
-    F["Ejecutar pruebas"]
-    G{"¿Cumple criterios de validación?"}
-    H["Identificar causa y corregir"]
-    I["Registrar resultados y limitaciones"]
-    J["Integrar en Notebook"]
-    K["Revisar cambios Git"]
-    L["Commit y publicación"]
-
-    A --> B
-    B --> C
-    C --> D
-    D --> E
-    E --> F
-    F --> G
-    G -->|No| H
-    H --> B
-    G -->|Sí| I
-    I --> J
-    J --> K
-    K --> L
-```
-
-Cada módulo se desarrollará de forma progresiva, relacionando sus fundamentos matemáticos con las funciones implementadas.
-
-Las pruebas deben producir evidencia reproducible. Se incorporarán procedimientos manuales cuando sean exigidos o aporten valor a la sustentación.
-
-Los commits registrarán cambios lógicos del desarrollo, evitando tanto las modificaciones masivas como la fragmentación innecesaria.
-
-## 4. Diagramas específicos pendientes
-
-Se añadirán posteriormente, cuando corresponda:
-
-- Pieper: desacoplamiento, ramas analíticas, filtrado y validación FK.
-- LSPB: selección de parámetros, factibilidad y evaluación temporal.
-- Jacobiano: construcción geométrica y comprobación manual.
-- Singularidades: evaluación de rango y experimento de proximidad.
-- Dinámica: evaluación del modelo y cálculo de torques.
-
-No se considerarán terminados estos diagramas hasta estudiar y comprobar los procedimientos correspondientes.
-
-## 5. Referencias
-
-**Fuentes académicas:**
-
-- `S09_material_oficial.pdf`, guías W09-S01 y W09-S02.
-- `S10_material_oficial.pdf`, seguimiento W10-S01.
-
-**Documentación interna:**
-
-- `requisitos_y_fuentes.md`.
-- `arquitectura_y_convenciones.md`.
-- Diagramas del Hito 1: `equipo/hitos/hito1/docs/diagramas_flujo.md`.
-
-Los flujos aquí descritos corresponden al diseño técnico del equipo. Los requisitos específicos del docente se identifican en `requisitos_y_fuentes.md`.
-
-## 6. Diagrama específico: cinemática inversa analítica de Pieper
-
-Este diagrama representa el procedimiento implementado en `src/pieper.py` para el ABB IRB 120, utilizando el modelo D-H incorporado desde el Hito 1.
+La función `solve_pieper()` resuelve las configuraciones articulares compatibles con una pose objetivo válida.
 
 ```mermaid
 flowchart TD
-    A["Recibir pose objetivo 4x4"]
-    B["Validar dimensiones y matriz de rotación"]
-    C{"¿Objetivo TCP?"}
-    D["Convertir pose TCP a brida"]
-    E["Utilizar pose de brida"]
-    F["Calcular centro de muñeca"]
-    G["Calcular rho, h, L y beta"]
-    H{"¿Centro geométricamente alcanzable?"}
-    I["Registrar objetivo inalcanzable"]
-    J["Generar direcciones candidatas de J1"]
-    K["Resolver ramas J2 y J3"]
-    L["Calcular R03 para cada rama"]
-    M["Calcular R36 = R03 transpuesta por R06"]
-    N{"¿Muñeca singular?"}
-    O["Obtener representante usando q_seed"]
-    P["Resolver dos ramas regulares J4, J5 y J6"]
-    Q["Formar configuraciones articulares"]
-    R["Normalizar ángulos"]
-    S["Comprobar posición y orientación con FK"]
-    T{"¿Cumple tolerancias?"}
-    U["Registrar diagnóstico de descarte"]
-    V["Evitar soluciones duplicadas"]
-    W["Devolver soluciones y diagnósticos"]
+    A["Recibir transformación objetivo"]
+    B["Validar pose y marco"]
+    C["Obtener pose equivalente de brida"]
+    D["Calcular centro de muñeca"]
+    E{"¿Centro alcanzable?"}
+    F["Registrar objetivo inalcanzable"]
+    G["Resolver ramas del brazo"]
+    H["Resolver ramas de muñeca"]
+    I["Normalizar ángulos"]
+    J["Comprobar soluciones mediante FK"]
+    K["Eliminar duplicados"]
+    L["Devolver soluciones y diagnósticos"]
 
-    A --> B
-    B --> C
-    C -->|Sí| D
-    C -->|No| E
-    D --> E
-    E --> F
-    F --> G
-    G --> H
-    H -->|No| I
-    H -->|Sí| J
-    J --> K
-    K --> L
-    L --> M
-    M --> N
-    N -->|Sí| O
-    N -->|No| P
-    O --> Q
-    P --> Q
-    Q --> R
-    R --> S
-    S --> T
-    T -->|No| U
-    T -->|Sí| V
-    V --> W
-    U --> W
-    I --> W
+    A --> B --> C --> D --> E
+    E -->|No| F --> L
+    E -->|Sí| G --> H --> I --> J --> K --> L
 ```
 
-Las operaciones sobre las ramas de brazo y muñeca se repiten para cada candidata. El diagrama resume el procedimiento; los bucles y condiciones exactos se encuentran en el código fuente.
+### Desacoplamiento geométrico
 
-### Interfaz implementada
+El centro de muñeca se determina mediante:
 
-La función principal es:
+$$
+\mathbf p_{wc}=
+\mathbf p_d-d_6R_d
+\begin{bmatrix}0\\0\\1\end{bmatrix}
+$$
 
-```python
-solve_pieper(
-    T_target,
-    target_frame="flange",
-    q_seed=None,
-    position_tolerance_m=1e-8,
-    orientation_tolerance_rad=1e-7,
-    singularity_tolerance=1e-9,
-)
-```
+La orientación residual se obtiene como:
 
-- `T_target`: matriz homogénea objetivo de 4 × 4.
-- `target_frame`: `"flange"` o `"tcp"`.
-- `q_seed`: referencia articular opcional, en radianes, utilizada para elegir representantes en ciertos casos singulares. No selecciona la solución final de una lista de ramas regulares.
-- `position_tolerance_m`: tolerancia de validación FK en metros.
-- `orientation_tolerance_rad`: tolerancia de orientación en radianes.
-- `singularity_tolerance`: umbral numérico utilizado para detectar situaciones geométricas degeneradas o singulares.
+$$
+R_3^6=(R_0^3)^TR_d
+$$
 
-La salida `PieperResult` incluye:
+En posturas regulares pueden existir hasta ocho ramas matemáticas. Las singularidades pueden producir ramas coincidentes o familias continuas de soluciones.
 
-- `solutions`: candidatas que superaron la comprobación FK.
-- `wrist_center_m`: posición del centro de muñeca en el marco base.
-- `diagnostics`: mensajes relativos a singularidades, imposibilidades geométricas y descartes.
+**Implementación:** `src/pieper.py`.
 
-Cada objeto `PieperSolution` registra sus seis ángulos articulares, las ramas de brazo y muñeca, los errores de reconstrucción y si representa un caso singular.
-
-### Validación inicial realizada
-
-El 13 de octubre de 2026 se ejecutaron desde `hito2/` las pruebas automatizadas con `unittest`.
-
-Resultado: **11 pruebas satisfactorias**, incluyendo cuatro de FK y siete de Pieper.
-
-La prueba de Pieper contempla una pose con ocho ramas regulares, entradas de TCP, casos singulares, entrada inválida, objetivo inalcanzable y 100 configuraciones articulares aleatorias.
-
-El código verifica las transformaciones candidatas usando la FK local del Hito 2.
-
-### Limitaciones actuales
-
-El algoritmo todavía no aplica los límites articulares del fabricante ni comprueba colisiones. Tampoco selecciona automáticamente la candidata óptima para el posterior movimiento LSPB.
-
-En singularidades devuelve un representante de la familia de soluciones y registra la situación mediante los diagnósticos correspondientes.
-
-Por tanto, los resultados actuales constituyen soluciones matemáticas comprobadas mediante FK, no una garantía de ejecución física en el ABB IRB 120.
-
-### Referencias
-
-- `S09_material_oficial.pdf`, guía W09-S01: ramas analíticas y verificación por cinemática directa.
-- `S09_material_oficial.pdf`, guía final W09-S02: integración de Pieper en el pipeline del Hito 2.
-- `src/pieper.py`: implementación propia del Hito 2.
-- `validacion/test_pieper.py`: pruebas automatizadas.
-- `src/irb120_fk.py`: cinemática directa reutilizada y validada.
-
-
-## 7. Diagrama específico: filtrado ABB y selección de soluciones
-
-Este diagrama representa el módulo `src/seleccion_pieper.py`, que procesa las soluciones matemáticas obtenidas mediante `src/pieper.py`.
-
-Los límites articulares corresponden a los rangos nominales publicados por ABB, documentados en `arquitectura_y_convenciones.md`, sección 10.
+## 4. Filtrado ABB y selección articular
 
 ```mermaid
 flowchart TD
-    A["Recibir resultado Pieper, q_inicio y pesos"]
-    B["Validar entradas y limites de q_inicio"]
-    C["Recorrer soluciones verificadas por FK"]
-    D{"¿Cumple limites ABB?"}
-    E["Registrar rama y juntas fuera de limites"]
-    F["Generar variantes equivalentes de J6"]
-    G{"¿Existen variantes admisibles?"}
-    H["Registrar descarte"]
-    I["Calcular costo ponderado por variante"]
-    J["Agregar configuraciones admisibles"]
-    K{"¿Quedan ramas por procesar?"}
-    L["Ordenar candidatas por costo"]
-    M{"¿Hay candidatas admisibles?"}
-    N["Seleccionar la de menor costo"]
-    O["Seleccionada = None"]
-    P["Conservar diagnosticos y advertencias"]
-    Q["Devolver ResultadoSeleccion"]
+    A["Recibir soluciones de Pieper"]
+    B["Comprobar límites ABB"]
+    C{"¿Configuración admisible?"}
+    D["Registrar motivo de descarte"]
+    E["Generar equivalencias de J6"]
+    F["Calcular costos articulares"]
+    G["Ordenar candidatas admisibles"]
+    H["Seleccionar costo mínimo"]
+    I["Devolver resultado y diagnósticos"]
 
-    A --> B
-    B --> C
-    C --> D
-    D -->|No| E
-    D -->|Si| F
-    E --> K
-    F --> G
-    G -->|No| H
-    G -->|Si| I
-    H --> K
-    I --> J
-    J --> K
-    K -->|Si| C
-    K -->|No| L
-    L --> M
-    M -->|Si| N
-    M -->|No| O
-    N --> P
-    O --> P
-    P --> Q
+    A --> B --> C
+    C -->|No| D --> I
+    C -->|Sí| E --> F --> G --> H --> I
 ```
 
 ### Criterio de selección
 
 Entre las representaciones articulares admisibles se utiliza:
 
-\[
-C(q)=\sum_{i=1}^{6}w_i(q_i-q_{inicio,i})^2
-\]
+$$
+C(\mathbf q)=
+\sum_{i=1}^{6}
+w_i(q_i-q_{\mathrm{inicio},i})^2
+$$
 
 La solución seleccionada es aquella que minimiza el costo.
 
-Los pesos son configurables; por defecto cada articulación tiene peso unitario.
+Los pesos son configurables; por defecto, cada articulación tiene peso unitario.
 
 ### Tratamiento de J6
 
 El módulo considera representaciones equivalentes:
 
-\[
-q_6'=q_6+2k\pi
-\]
+$$
+q_6'=q_6+2k\pi,\qquad k\in\mathbb Z
+$$
 
-con \(k\) entero y siempre dentro del rango nominal ABB de -400° a +400°.
+Las representaciones se conservan únicamente cuando cumplen el rango nominal ABB de −400° a +400°.
 
-Se conservan las representaciones admisibles para evaluar cuál requiere menor desplazamiento desde `q_inicio`.
+Aunque producen la misma pose mediante FK, pueden requerir desplazamientos articulares diferentes desde `q_inicio`.
 
 ### Información conservada
 
-La salida `ResultadoSeleccion` mantiene:
+El resultado incluye:
 
 - Configuraciones admisibles y sus costos.
 - Ramas descartadas y sus violaciones de límites.
 - Configuración seleccionada, si existe.
-- Diagnósticos originales de Pieper y advertencias adicionales.
+- Diagnósticos de Pieper y del filtrado.
 
-### Validación y limitaciones
+**Implementaciones:** `src/limites_irb120.py` y `src/seleccion_pieper.py`.
 
-El 13 de octubre de 2026 se ejecutaron 24 pruebas satisfactorias: cuatro de FK, siete de Pieper, seis de límites articulares y siete de selección.
-
-El módulo no evalúa colisiones ni factibilidad temporal. Las configuraciones seleccionadas aún requieren un análisis LSPB y validación de velocidades y aceleraciones.
-
-Las soluciones singulares corresponden a representantes particulares y no a una exploración exhaustiva de las familias continuas.
-
-### Referencias
-
-- `3HAC035960-005`, revisión W, sección 1.8.1, página impresa 37.
-- `3HAC035728-005`, revisión W, sección 2.2.2, página impresa 50.
-- `docs/arquitectura_y_convenciones.md`, secciones 10 y 11.
-- `src/limites_irb120.py`.
-- `src/seleccion_pieper.py`.
-- `validacion/test_limites_irb120.py`.
-- `validacion/test_seleccion_pieper.py`.
-
-
-## 8. Diagrama específico: planificación articular LSPB
-
-Este diagrama representa la implementación de `src/lspb.py`, que genera una trayectoria articular de reposo a reposo a partir de las posiciones inicial y final.
-
-El fundamento matemático procede de W09-S01 del material oficial del docente. Los límites de velocidad del ABB IRB 120 proceden del manual del fabricante documentado en `arquitectura_y_convenciones.md`, sección 12.
+## 5. Planificación articular LSPB
 
 ```mermaid
 flowchart TD
-    A["Recibir q_inicio, q_final, tf y aceleraciones"]
-    B["Validar dimensiones, valores finitos y parametros positivos"]
-    C{"¿Movimiento de 6 juntas?"}
-    D["Comprobar posiciones iniciales y finales contra limites ABB"]
-    E["Aplicar velocidades nominales ABB"]
-    F["Usar cotas de velocidad suministradas, si existen"]
-    G["Determinar velocidades maximas efectivas"]
-    H["Calcular desplazamientos articulares"]
-    I{"¿Aceleraciones suficientes para tf?"}
-    J["Rechazar perfil inviable"]
-    K["Calcular tiempos de mezcla tc"]
-    L["Calcular velocidades de crucero"]
-    M{"¿Se cumplen limites de velocidad?"}
-    N["Crear PerfilLSPB"]
-    O["Recibir instante o vector de tiempos"]
-    P{"¿Tiempos dentro de 0 a tf?"}
-    Q["Evaluar fases de aceleracion, crucero y frenado"]
-    R["Devolver q, qdot y qddot"]
+    A["Configuraciones inicial y final"]
+    B["Tiempo total y aceleraciones"]
+    C["Verificar factibilidad"]
+    D{"¿Perfil válido?"}
+    E["Registrar parámetros inviables"]
+    F["Calcular tiempos de mezcla"]
+    G["Calcular velocidades de crucero"]
+    H["Evaluar q, qdot y qddot"]
+    I["Verificar límites y condiciones"]
+    J["Presentar perfiles temporales"]
 
-    A --> B --> C
-    C -->|Si| D --> E --> F  --> G
-    C -->|No| F --> G
-    G --> H --> I
-    I -->|No| J
-    I -->|Si| K --> L --> M
-    M -->|No| J
-    M -->|Si| N --> O --> P
-    P -->|No| J
-    P -->|Si| Q --> R
+    A --> C
+    B --> C
+    C --> D
+    D -->|No| E
+    D -->|Sí| F --> G --> H --> I --> J
 ```
-
-### Etapas matemáticas
 
 Para cada articulación:
 
-\[
-\Delta q_i=q_{final,i}-q_{inicio,i}
-\]
+$$
+\Delta q_i=q_{f,i}-q_{0,i}
+$$
 
-Se comprueba:
+La condición de factibilidad es:
 
-\[
+$$
 a_i\geq\frac{4|\Delta q_i|}{t_f^2}
-\]
+$$
 
-Si la condición se cumple, se calculan:
+El tiempo de mezcla satisface:
 
-\[
-t_{c,i}=
-\frac{t_f-\sqrt{t_f^2-4|\Delta q_i|/a_i}}{2}
-\]
+$$
+|\Delta q_i|=
+a_i t_{c,i}(t_f-t_{c,i})
+$$
 
-\[
-v_{c,i}=\operatorname{sgn}(\Delta q_i)a_i t_{c,i}
-\]
+La velocidad de crucero es:
 
-La implementación emplea una expresión algebraicamente equivalente para calcular `tc` con mayor estabilidad numérica.
+$$
+v_{c,i}=
+\operatorname{sgn}(\Delta q_i)a_i t_{c,i}
+$$
 
 ### Evaluación por fases
 
-La función `perfil.evaluar(t)` calcula:
-
-1. Aceleración inicial.
-2. Movimiento a velocidad constante, cuando existe.
+1. Aceleración.
+2. Velocidad constante, cuando existe.
 3. Frenado hasta el reposo.
 
-En el perfil triangular no existe un intervalo de crucero de duración positiva.
+El LSPB ideal mantiene continuidad de posición y velocidad. La aceleración puede cambiar de manera discontinua.
 
-Para desplazamientos nulos, la articulación permanece inmóvil.
+En la planificación 6R se utiliza una duración común para las seis articulaciones.
 
-### Sincronización de seis articulaciones
+**Implementación:** `src/lspb.py`.
 
-Las seis articulaciones utilizan la misma duración total `tf`, aunque cada una puede tener un tiempo de mezcla `tc` diferente.
-
-La evaluación devuelve posiciones, velocidades y aceleraciones para los instantes solicitados.
-
-### Restricciones y alcance
-
-Para 6R, se aplican los límites nominales de posición y velocidad ABB.
-
-Las aceleraciones son parámetros de planificación elegidos por el equipo; no se consideran especificaciones certificadas del fabricante.
-
-El módulo comprueba factibilidad cinemática y temporal del perfil bajo las restricciones suministradas. No verifica colisiones, torques ni factibilidad dinámica.
-
-### Validación
-
-El 13 de octubre de 2026 se ejecutaron 38 pruebas satisfactorias del Hito 2, incluidas 14 pruebas del módulo LSPB.
-
-Entre ellas se verificó la integración FK → Pieper → selección articular → LSPB → FK final.
-
-### Referencias
-
-- `S09_material_oficial.pdf`, W09-S01, diapositivas 8–10.
-- ABB `3HAC035960-005`, revisión W, sección 1.8.3, página impresa 40.
-- `docs/arquitectura_y_convenciones.md`, secciones 12 y 13.
-- `src/lspb.py`.
-- `validacion/test_lspb.py`.
-
-
-## 9. Diagrama específico: Jacobiano geométrico del ABB IRB 120
-
-Este diagrama describe el procedimiento implementado en `src/jacobiano.py`.
-
-El cálculo utiliza D-H estándar, las transformaciones del modelo del Hito 1 y las convenciones articulares documentadas en `arquitectura_y_convenciones.md`, sección 14.
+## 6. Jacobiano geométrico
 
 ```mermaid
 flowchart TD
-    A["Recibir q y target_frame"]
-    B["Validar seis valores articulares finitos"]
-    C{"¿Frame flange o tcp?"}
-    D["Construir parametros DH, incluido offset J2"]
-    E["Calcular transformaciones 0T0 hasta 0T6"]
-    F{"¿Se solicita TCP?"}
-    G["Aplicar transformacion fija 6Ttcp"]
-    H["Conservar pose de brida 0T6"]
-    I["Obtener posicion del efector en marco 0"]
-    J["Recorrer las seis juntas revolutas"]
-    K["Extraer eje z y origen del frame anterior"]
-    L["Calcular Jv = z cruz (pe - o)"]
-    M["Calcular Jw = z"]
-    N["Ensamblar columna del Jacobiano"]
-    O{"¿Quedan juntas?"}
-    P["Devolver matriz J de 6 por 6"]
-    Q["Si se recibe qdot, calcular J por qdot"]
-    R["Devolver velocidad lineal y angular"]
-    X["Rechazar entrada invalida"]
+    A["Recibir configuración articular"]
+    B["Calcular transformaciones D-H"]
+    C["Seleccionar brida o TCP"]
+    D["Obtener ejes y orígenes articulares"]
+    E["Construir columnas del Jacobiano"]
+    F["Ensamblar matriz 6 por 6"]
+    G["Multiplicar por velocidades articulares"]
+    H["Obtener velocidad cartesiana"]
 
-    A --> B --> C
-    C -->|No valido| X
-    C -->|Valido| D --> E --> F
-    F -->|Si| G --> I
-    F -->|No| H --> I
-    I --> J --> K --> L --> M --> N --> O
-    O -->|Si| J
-    O -->|No| P
-    P --> Q --> R
+    A --> B --> C --> D --> E --> F --> G --> H
 ```
 
 ### Convenciones
 
-El Jacobiano geométrico expresa todas sus componentes en el marco base `{0}`:
+El Jacobiano expresa sus componentes respecto al marco base `{0}`:
 
-\[
-{}^0V_e={}^0J(q)\dot q
-\]
+$$
+{}^0\mathbf V_e=
+{}^0J_e(\mathbf q)\dot{\mathbf q}
+$$
 
 Para una articulación revoluta:
 
-\[
+$$
 {}^0J_i=
 \begin{bmatrix}
-{}^0z_{i-1}\times({}^0p_e-{}^0o_{i-1})\\
-{}^0z_{i-1}
+{}^0\mathbf z_{i-1}\times
+({}^0\mathbf p_e-{}^0\mathbf o_{i-1})\\
+{}^0\mathbf z_{i-1}
 \end{bmatrix}
-\]
+$$
 
-La salida `J(q)` es una matriz de dimensión 6×6: velocidad lineal en las primeras tres filas y velocidad angular en las últimas tres filas.
+El Jacobiano tiene dimensión 6×6:
+
+- Tres filas de velocidad lineal.
+- Tres filas de velocidad angular.
+- Una columna por articulación.
 
 ### Validación
 
-La implementación se verificó mediante:
+Se verificó mediante:
 
-- Cálculo manual de las columnas J1 y J2 en la configuración cero.
-- Comparación de las transformaciones intermedias con FK.
-- Validación numérica mediante diferencias finitas de posición y orientación.
-- Comparación de velocidades cartesianas con derivadas numéricas de FK.
-- Comprobación de brida y TCP.
-- Validación de entradas inválidas.
+- Cálculo manual de columnas de J1 y J2.
+- Comparación de transformaciones con FK.
+- Diferencias finitas de posición y orientación.
+- Comprobaciones para brida y TCP.
 
-La batería completa del Hito 2 produjo 47 pruebas satisfactorias, incluidas nueve del Jacobiano.
+**Implementación:** `src/jacobiano.py`.
 
-### Alcance y limitaciones
-
-El módulo calcula el Jacobiano geométrico y permite obtener la velocidad cartesiana a partir de las velocidades articulares.
-
-No determina todavía el rango ni clasifica singularidades. Esas operaciones corresponden a un experimento computacional independiente.
-
-La aproximación a una singularidad, la pérdida de movilidad y la amplificación de velocidades articulares se estudiarán en el siguiente módulo.
-
-### Referencias
-
-- `S10_material_oficial.pdf`, `hito_2_guia.pdf`, página 31.
-- `S10_material_oficial.pdf`, `hito_2_rubrica.pdf`, página 35.
-- `docs/arquitectura_y_convenciones.md`, sección 14.
-- `src/jacobiano.py`.
-- `validacion/test_jacobiano.py`.
-
-
-## 10. Diagrama específico: singularidad de muñeca del ABB IRB 120
-
-El diagrama representa el experimento independiente implementado en `src/singularidades.py`, a partir del Jacobiano geométrico de `src/jacobiano.py`.
-
-Se estudia la aproximación hacia \(q_5=0\), manteniendo constantes las demás articulaciones.
+## 7. Experimento de singularidad de muñeca
 
 ```mermaid
 flowchart TD
-    A["Recibir configuración de referencia y parámetros"]
-    B["Validar entradas, límites ABB y secuencia q5"]
-    C["Construir configuración singular con q5 igual a cero"]
-    D["Calcular Jacobiano normalizado y SVD"]
-    E{"¿Rango singular igual a 5?"}
-    X["Rechazar experimento no válido"]
-    F["Identificar dirección cartesiana perdida"]
-    G["Construir consigna cartesiana fija"]
-    H["Recorrer valores de q5"]
-    I["Calcular Jacobiano geométrico"]
-    J["Normalizar y calcular SVD y rango"]
-    K["Registrar rango, valor singular mínimo y condición"]
-    L{"¿Rango completo?"}
-    M["Resolver J qdot = consigna fija"]
-    N["Registrar norma de qdot y error"]
-    O["Registrar velocidad no definida y error no realizable"]
-    P{"¿Quedan configuraciones?"}
-    Q["Consolidar resultados numéricos"]
-    R["Exportar datos CSV"]
-    S["Generar tres gráficas"]
-    T["Interpretar pérdida de rango y amplificación"]
+    A["Definir postura de referencia"]
+    B["Aproximar J5 a cero"]
+    C["Calcular Jacobiano"]
+    D["Obtener SVD y rango"]
+    E{"¿Rango completo?"}
+    F["Resolver velocidad articular"]
+    G["Registrar movilidad perdida"]
+    H["Comparar valores singulares y velocidades"]
+    I["Graficar resultados"]
 
     A --> B --> C --> D --> E
-    E -->|No| X
-    E -->|Sí| F --> G --> H --> I --> J --> K --> L
-    L -->|Sí| M --> N --> P
-    L -->|No| O --> P
-    P -->|Sí| H
-    P -->|No| Q --> R --> S --> T
+    E -->|Sí| F --> H
+    E -->|No| G --> H
+    H --> I
 ```
 
-### Criterio matemático
+### Criterio de singularidad
 
-Se utiliza el rango numérico del Jacobiano como criterio principal:
-
-\[
+$$
 \operatorname{rank}(J)<6
-\]
+$$
 
-Los valores singulares, el número de condición y los vectores singulares se calculan mediante SVD como herramientas complementarias.
+En la configuración analizada, cuando $q_5=0$, los ejes de J4 y J6 se alinean y el rango del Jacobiano disminuye de 6 a 5.
 
-La componente lineal se normaliza mediante una longitud de referencia declarada de 1 m.
+El experimento registra:
 
-### Interpretación física
+- Rango del Jacobiano.
+- Menor valor singular.
+- Número de condición.
+- Norma de velocidad articular requerida.
 
-En la configuración estudiada, cuando \(q_5=0\), los ejes de las articulaciones J4 y J6 se alinean. El Jacobiano pasa de rango 6 a rango 5.
+Para una misma consigna cartesiana, la norma de velocidad articular puede crecer considerablemente al aproximarse a la singularidad.
 
-La pérdida de rango representa una dirección independiente de velocidad cartesiana que el robot no puede generar instantáneamente.
+En la postura singular no se invierte el Jacobiano.
 
-La consigna cartesiana se mantiene fija durante la aproximación. En las configuraciones regulares se resuelve el sistema de velocidades articulares. En la configuración singular no se intenta invertir el Jacobiano.
+**Implementación:** `src/singularidades.py`.
 
-Las velocidades calculadas tienen finalidad diagnóstica y no representan comandos admisibles para el ABB IRB 120.
-
-### Evidencias reproducibles
-
-El script `evidencias/generar_graficas_singularidad.py` genera:
-
-- `evidencias/figuras/01_rango_jacobiano.png`
-- `evidencias/figuras/02_valor_singular_minimo.png`
-- `evidencias/figuras/03_amplificacion_velocidades.png`
-- `evidencias/figuras/singularidad_muneca_datos.csv`
-
-La batería completa del Hito 2 ejecutó satisfactoriamente 57 pruebas, incluidas diez específicas del módulo de singularidades.
-
-### Referencias
-
-- `S10_material_oficial.pdf`, guía del Hito 2, página 31.
-- `S10_material_oficial.pdf`, rúbrica del Hito 2, página 35.
-- `docs/arquitectura_y_convenciones.md`, sección 15.
-- `src/singularidades.py`.
-- `validacion/test_singularidades.py`.
-- `evidencias/README.md`.
-
-
-## 11. Diagrama específico: dinámica reducida 1R y torque
-
-Este diagrama describe el procedimiento implementado en `src/dinamica_1r.py`, que utiliza los perfiles temporales generados por `src/lspb.py`.
-
-El modelo corresponde a la dinámica didáctica reducida 1R establecida por el docente para el Hito 2.
+## 8. Dinámica reducida 1R
 
 ```mermaid
 flowchart TD
-    A["Recibir perfil LSPB, tiempos y parámetros dinámicos"]
-    B["Validar parámetros y unidades"]
-    C{"¿Perfil LSPB de 1R o 6R?"}
-    D["Usar la única articulación del perfil 1R"]
-    E["Exigir selección explícita de articulación para perfil 6R"]
-    F["Evaluar q, qdot y qddot mediante LSPB"]
-    G["Extraer la señal articular seleccionada"]
-    H["Calcular torque inercial J1R por qddot"]
-    I["Calcular torque gravitatorio m g lc sin q"]
-    J["Sumar componentes para obtener torque total"]
-    K["Devolver variables cinemáticas y torques"]
-    L["Generar datos y gráficas reproducibles"]
-    M["Interpretar aceleración, crucero y frenado"]
-    X["Rechazar parámetros o selección inválidos"]
+    A["Definir trayectoria LSPB 1R"]
+    B["Definir parámetros dinámicos"]
+    C["Evaluar posición y aceleración"]
+    D["Calcular torque inercial"]
+    E["Calcular torque gravitatorio"]
+    F["Sumar componentes"]
+    G["Graficar torque total"]
 
-    A --> B --> C
-    B -->|Inválidos| X
-    C -->|1R| D --> F
-    C -->|6R| E
-    E -->|Selección válida| F
-    E -->|Selección inválida| X
-    F --> G --> H --> I --> J --> K --> L --> M
+    A --> C
+    B --> C
+    C --> D
+    C --> E
+    D --> F
+    E --> F
+    F --> G
 ```
 
-### Fundamento matemático
+### Modelo matemático
 
-La dinámica reducida 1R se modela mediante:
+$$
+\tau(t)=J_{1R}\ddot q(t)+mg\ell_c\sin q(t)
+$$
 
-\[
-\tau(t)=J_{1R}\ddot q(t)+mg\ell_c\sin(q(t))
-\]
+Torque inercial:
 
-El torque inercial es:
+$$
+\tau_I(t)=J_{1R}\ddot q(t)
+$$
 
-\[
-\tau_{\mathrm{inercial}}(t)=J_{1R}\ddot q(t)
-\]
+Torque gravitatorio:
 
-El torque gravitatorio es:
+$$
+\tau_g(t)=mg\ell_c\sin q(t)
+$$
 
-\[
-\tau_{\mathrm{gravitatorio}}(t)=mg\ell_c\sin(q(t))
-\]
+### Caso de validación
 
-El torque total corresponde a la suma de ambas contribuciones.
+Se utiliza el ejemplo oficial W10-S01:
 
-### Interpretación del perfil LSPB
+| Parámetro | Valor |
+|---|---:|
+| Inercia equivalente | 0.25 kg·m² |
+| Masa | 1 kg |
+| Distancia al centro de masa | 0.5 m |
+| Gravedad | 9.81 m/s² |
+| Desplazamiento | 0 a 2 rad |
+| Tiempo total | 3 s |
+| Aceleración | 1 rad/s² |
 
-Durante la aceleración, el torque inercial tiene el signo de la aceleración.
+Para $t=2.5$ s se obtuvo:
 
-Durante el crucero, la aceleración es nula, pero puede existir torque gravitatorio.
+$$
+\tau=4.429791\ \mathrm{N\,m}
+$$
 
-Durante el frenado, cambia el signo de la aceleración y, con ello, la contribución inercial.
+El modelo corresponde a una articulación académica y no representa los torques reales del ABB IRB 120 completo.
 
-Las discontinuidades de aceleración del LSPB ideal pueden producir saltos en el torque inercial.
+**Implementación:** `src/dinamica_1r.py`.
 
-### Validación numérica
+## 9. Validación del sistema
 
-Se empleó el ejercicio oficial W10-S01 con los siguientes parámetros didácticos:
+Los componentes se verificaron mediante pruebas automatizadas e integración en Jupyter.
 
-- Inercia equivalente: 0.25 kg·m².
-- Masa: 1 kg.
-- Distancia al centro de masa: 0.5 m.
-- Gravedad: 9.81 m/s².
-- Desplazamiento: 0 a 2 rad.
-- Tiempo total: 3 s.
-- Aceleración: 1 rad/s².
+Las validaciones comprenden:
 
-Para t = 2.5 s se obtuvo un torque de 4.429791 N·m, consistente con el solucionario del docente.
+- Cinemática directa.
+- Soluciones analíticas de Pieper.
+- Límites ABB y selección.
+- Factibilidad LSPB.
+- Jacobiano geométrico.
+- Singularidad de muñeca.
+- Dinámica reducida 1R.
 
-La batería completa del Hito 2 ejecutó satisfactoriamente 71 pruebas, incluidas 14 específicas del módulo de dinámica reducida 1R.
+En la ejecución integral del 22 de octubre de 2026 se obtuvieron **71 pruebas satisfactorias**.
 
-### Evidencias reproducibles
+Los resultados se presentan en `notebooks/hito2_integracion.ipynb` y en el informe IEEE.
 
-El script `evidencias/generar_graficas_dinamica_1r.py` produce:
+## 10. Referencias
 
-- `evidencias/figuras/01_perfiles_lspb_1r.png`
-- `evidencias/figuras/02_torques_componentes_1r.png`
-- `evidencias/figuras/03_torque_total_1r.png`
-- `evidencias/figuras/dinamica_1r_datos.csv`
+### Material académico
 
-Los resultados corresponden a un modelo pedagógico de un grado de libertad. No representan los torques reales de los seis actuadores del ABB IRB 120.
+- `S09_material_oficial.pdf`: guías de implementación del Hito 2.
+- `S10_material_oficial.pdf`: guía, rúbrica y solucionario.
+- `Guia_PFI.pdf`: alcance general del proyecto.
 
-### Referencias
+### Documentación técnica
 
-- `S10_material_oficial.pdf`, guía del Hito 2, página 31.
-- `S10_material_oficial.pdf`, solucionario W10-S01, página 17.
-- `docs/arquitectura_y_convenciones.md`, sección 16.
-- `src/lspb.py`.
-- `src/dinamica_1r.py`.
-- `validacion/test_dinamica_1r.py`.
-- `evidencias/README_dinamica_1r.md`.
+- ABB `3HAC035960-005`.
+- ABB `3HAC035728-005`.
+- `docs/arquitectura_y_convenciones.md`.
+- `docs/requisitos_y_fuentes.md`.
