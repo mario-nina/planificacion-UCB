@@ -1,17 +1,16 @@
+
 """Dinámica reducida 1R alimentada por una trayectoria LSPB existente.
 
-Fuente docente: IMT-342, S10_material_oficial.pdf, guia oficial del Hito 2
-(pp. 31-32) y solucionario W10-S01 (pp. 16-17).
+Modelo académico de IMT-342:
+    tau = J_1R*qddot + m*g*lc*sin(q)
+    J_1R = Ic + m*lc**2
 
-Modelo educativo: tau = J_1R*qddot + m*g*lc*sin(q), medido desde la
-vertical inferior, con J_1R = Ic + m*lc**2 constante. El término de
-Coriolis/centrífugo no aparece en ESTE modelo 1R particular.
+El ángulo se mide desde la vertical inferior. J_1R es inercia,
+no el Jacobiano geométrico.
 
-NO es el modelo dinámico completo del ABB IRB 120 ni predice el torque
-real de sus actuadores. No se deben atribuir estas masas o inercias a ABB.
-Si se elige una junta de un LSPB 6R, su q se emplea como señal de entrada
-pedagógica: no se identifica automáticamente con el ángulo gravitatorio
-físico de esa junta (que depende de marcos y acoplamientos).
+No representa la dinámica completa ni los torques reales del ABB IRB 120.
+Si se utiliza una junta de un perfil 6R, su trayectoria actúa solamente
+como señal de entrada al modelo pedagógico 1R.
 """
 
 from dataclasses import dataclass
@@ -22,27 +21,30 @@ from .lspb import PerfilLSPB
 
 
 def _escalar(nombre, valor, *, estrictamente_positivo=True):
+    """Valida un parámetro numérico finito y su condición de signo."""
     try:
         numero = float(valor)
     except (TypeError, ValueError, OverflowError) as exc:
         raise ValueError(f"{nombre} debe ser un escalar finito.") from exc
+
     if not np.isfinite(numero):
         raise ValueError(f"{nombre} debe ser un escalar finito.")
     if estrictamente_positivo and numero <= 0:
         raise ValueError(f"{nombre} debe ser positivo.")
     if not estrictamente_positivo and numero < 0:
         raise ValueError(f"{nombre} no puede ser negativo.")
+
     return numero
 
 
 @dataclass(frozen=True)
 class ParametrosDinamica1R:
-    """Parametros didacticos del 1R en unidades SI, no parametros ABB.
+    """Parámetros didácticos en SI; no corresponden a datos ABB.
 
-    inercia_kg_m2: Ic + m*lc**2, kg*m^2 (no Jacobiano geometrico).
-    masa_kg: masa concentrada/equivalente del modelo, kg.
-    longitud_cm_m: distancia del eje al centro de masa, m.
-    gravedad_m_s2: magnitud de g, m/s^2; cero permite aislar la inercia.
+    inercia_kg_m2: J_1R = Ic + m*lc**2.
+    masa_kg: masa del modelo.
+    longitud_cm_m: distancia del eje al centro de masa.
+    gravedad_m_s2: magnitud de gravedad; puede ser cero.
     """
 
     inercia_kg_m2: float
@@ -61,7 +63,7 @@ class ParametrosDinamica1R:
 
 @dataclass(frozen=True)
 class MuestraDinamica1R:
-    """Para t escalar, cantidades float; para tiempos vectoriales, arrays (N,)."""
+    """Estado cinemático y componentes del torque para uno o varios tiempos."""
 
     t_s: float | np.ndarray
     q_rad: float | np.ndarray
@@ -70,24 +72,23 @@ class MuestraDinamica1R:
     tau_inercial_nm: float | np.ndarray
     tau_gravitatorio_nm: float | np.ndarray
     tau_total_nm: float | np.ndarray
-    indice_articulacion: int  # 0 en 1R, índice 0..5 para señal tomada de LSPB 6R
+    indice_articulacion: int  # 0 para 1R; índice 0..5 para una señal 6R
 
 
 def _escalar_o_vector(valor):
+    """Devuelve un float para escalares o una copia para arreglos."""
     salida = np.array(valor, dtype=float, copy=True)
     return float(salida) if salida.ndim == 0 else salida
 
 
 def evaluar_dinamica_1r(perfil, t, parametros, *, indice_articulacion=None):
-    """Calcula tau(t) para una señal articular obtenida desde LSPB.
+    """Evalúa el torque 1R usando q, qdot y qddot de un perfil LSPB.
 
-    `perfil` debe ser PerfilLSPB de 1 o 6 juntas. Para seis articulaciones
-    se exige seleccionar explícitamente `indice_articulacion` (0 a 5).
-    Esta selección es SOLO una entrada al modelo académico 1R; no modela
-    la dinámica acoplada de la articulación seleccionada del ABB.
+    Un perfil 1R utiliza su única articulación.
+    Un perfil 6R exige seleccionar explícitamente una de sus juntas.
 
-    Los puntos exactos de cambio de fase LSPB tienen aceleración ideal
-    discontinua; se utiliza la rama que devuelve `perfil.evaluar(t)`.
+    No calcula acoplamientos dinámicos del manipulador completo.
+    En los cambios de fase se utiliza la aceleración dada por LSPB.
     """
     if not isinstance(perfil, PerfilLSPB):
         raise ValueError("perfil debe ser un PerfilLSPB existente.")
@@ -95,6 +96,7 @@ def evaluar_dinamica_1r(perfil, t, parametros, *, indice_articulacion=None):
         raise ValueError("parametros debe ser ParametrosDinamica1R.")
 
     n = perfil.q_inicio.size
+
     if n == 1:
         if indice_articulacion not in (None, 0) or isinstance(indice_articulacion, bool):
             raise ValueError("En un perfil 1R, indice_articulacion debe ser 0 o None.")
@@ -108,10 +110,13 @@ def evaluar_dinamica_1r(perfil, t, parametros, *, indice_articulacion=None):
     else:
         raise ValueError("El perfil debe contener una o seis articulaciones.")
 
-    muestra = perfil.evaluar(t)  # conserva validación temporal del planificador
+    # Reutilizar la trayectoria ya calculada por el planificador LSPB.
+    muestra = perfil.evaluar(t)
     q = _escalar_o_vector(muestra.q[..., indice])
     qdot = _escalar_o_vector(muestra.qdot[..., indice])
     qddot = _escalar_o_vector(muestra.qddot[..., indice])
+
+    # Separar el torque de inercia y el de gravedad.
     tau_inercial = parametros.inercia_kg_m2 * qddot
     tau_gravitatorio = (
         parametros.masa_kg * parametros.gravedad_m_s2

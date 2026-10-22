@@ -1,10 +1,9 @@
-"""Cinematica inversa analitica por Pieper del ABB IRB 120 (modelo IMT-342).
 
-Convencion: DH estandar; theta_2 = q_2 - pi/2; unidades SI y radianes.
-No utiliza solucionadores numericos de IK.
+"""Cinemática inversa analítica del ABB IRB 120 mediante Pieper.
 
-Alcance: enumera ramas regulares de brazo y muneca, con representantes
-particulares de familias singulares. No impone limites articulares, ni colisiones.
+Convención DH estándar del Hito 1; ángulos en radianes y distancias en metros.
+Devuelve ramas matemáticas verificadas por FK, sin aplicar límites articulares
+ni comprobar colisiones. En singularidades retorna representantes particulares.
 """
 
 from dataclasses import dataclass
@@ -14,7 +13,7 @@ import numpy as np
 
 from .irb120_fk import forward_kinematics
 
-# Geometria en metros del modelo validado en el Hito 1.
+# Dimensiones (m) compartidas con el modelo DH de irb120_fk.py.
 D1 = 0.290
 A2 = 0.270
 A3 = 0.070
@@ -25,7 +24,7 @@ TCP_Z6 = 0.120
 
 @dataclass
 class PieperSolution:
-    """Candidata que reconstruye la pose objetivo, pendiente de limites fisicos."""
+    """Solución de IK verificada con FK, aún sin filtrar límites ABB."""
 
     q: np.ndarray
     arm_branch: str
@@ -37,7 +36,7 @@ class PieperSolution:
 
 @dataclass
 class PieperResult:
-    """Ramas matematicas y diagnosticos de la cinemática inversa."""
+    """Conjunto de soluciones, centro de muñeca y mensajes de diagnóstico."""
 
     solutions: list[PieperSolution]
     wrist_center_m: np.ndarray
@@ -45,12 +44,12 @@ class PieperResult:
 
 
 def _wrap(q):
-    """Angulos representativos en [-pi, pi)."""
+    """Reduce ángulos equivalentes al intervalo [-pi, pi)."""
     return (np.asarray(q, dtype=float) + pi) % (2 * pi) - pi
 
 
 def _rotation03(q1, q2, q3):
-    """R03 derivada de las tres primeras matrices DH del Hito 1."""
+    """Orientación del marco {3} respecto a {0}, según DH del Hito 1."""
     c1, s1 = cos(q1), sin(q1)
     c23, s23 = cos(q2 + q3), sin(q2 + q3)
     return np.array([
@@ -61,7 +60,7 @@ def _rotation03(q1, q2, q3):
 
 
 def _orientation_error_rad(R_calculated, R_target):
-    """Angulo SO(3) estable cerca de cero y de pi."""
+    """Ángulo de la rotación relativa entre orientación calculada y deseada."""
     E = R_target.T @ R_calculated
     v = np.array([
         E[2, 1] - E[1, 2],
@@ -74,6 +73,7 @@ def _orientation_error_rad(R_calculated, R_target):
 
 
 def _check_pose(T):
+    """Valida una matriz homogénea 4x4 con orientación en SO(3)."""
     T = np.asarray(T, dtype=float)
     if T.shape != (4, 4) or not np.all(np.isfinite(T)):
         raise ValueError("La pose debe ser una matriz finita 4x4.")
@@ -96,18 +96,14 @@ def solve_pieper(
     orientation_tolerance_rad=1e-7,
     singularity_tolerance=1e-9,
 ):
-    """Resuelve IK de Pieper para la brida o el TCP academico del IRB 120.
+    """Calcula las configuraciones articulares que alcanzan ``T_target``.
 
-    Parametros:
-        T_target: pose 4x4 en el marco base (brida o TCP).
-        target_frame: 'flange' o 'tcp'.
-        q_seed: referencia opcional en radianes para elegir representantes
-                singulares de q1 o de la muneca; NO filtra soluciones.
+    ``T_target`` es una pose 4x4 en la base, de ``flange`` o ``tcp``.
+    ``q_seed`` (6 radianes, opcional) fija representantes singulares;
+    no selecciona la solución óptima. Las tres tolerancias controlan
+    verificación de posición, orientación y detección de singularidad.
 
-    Devuelve:
-        PieperResult con ramas que superan FK. En singularidades se retorna
-        un representante de la familia, no todas las soluciones infinitas.
-        No filtra limites articulares, colisiones ni velocidades.
+    Retorna ``PieperResult``: soluciones verificadas por FK y diagnósticos.
     """
     if target_frame not in ("flange", "tcp"):
         raise ValueError("target_frame debe ser 'flange' o 'tcp'.")
@@ -126,17 +122,19 @@ def solve_pieper(
         if seed.shape != (6,) or not np.all(np.isfinite(seed)):
             raise ValueError("q_seed debe contener seis angulos finitos.")
 
+    # Trabajar internamente con la pose de la brida; deshacer el offset del TCP.
     T = _check_pose(T_target).copy()
     if target_frame == "tcp":
-        # La herramienta academica tiene traslacion local +0.120 m en z6.
         T[:3, 3] -= TCP_Z6 * T[:3, 2]
 
+    # Centro de muñeca: retroceder D6 a lo largo de z6 expresado en la base.
     R_d, p_d = T[:3, :3], T[:3, 3]
     p_wc = p_d - D6 * R_d[:, 2]
     xw, yw, zw = p_wc
     rho = float(np.hypot(xw, yw))
     h = zw - D1
 
+    # Triángulo J2-J3: ley de cosenos con L = sqrt(A3² + D4²).
     L = float(np.hypot(A3, D4))
     beta = atan2(D4, A3)
     D_squared = rho**2 + h**2
@@ -151,7 +149,7 @@ def solve_pieper(
         diagnostics.append("Ramas de codo coincidentes: triangulo degenerado.")
 
     if rho <= singularity_tolerance:
-        # La posicion no determina q1: seleccionar un representante.
+        # Sobre el eje J1, q1 es indeterminado: usar el valor de referencia.
         base_branches = [(float(seed[0]), 0.0, "base_indeterminada")]
         diagnostics.append(
             "Centro sobre el eje J1: infinitas direcciones base; "
@@ -164,6 +162,7 @@ def solve_pieper(
             (q1 + pi, -rho, "base_opuesta"),
         ]
 
+    # Dos alternativas de codo por rama de base; luego orientar la muñeca.
     solutions = []
     for q1, r, base_name in base_branches:
         for elbow_sign in (1, -1):
@@ -171,10 +170,13 @@ def solve_pieper(
             q2 = atan2(r, h) - atan2(L * sin(delta), A2 + L * cos(delta))
             q3 = delta - beta
             arm_name = f"{base_name}/codo_{'+' if elbow_sign > 0 else '-'}"
+
+            # Desacoplamiento de orientación: R36 = R03.T @ R06.
             R36 = _rotation03(q1, q2, q3).T @ R_d
             s5_abs = float(np.hypot(R36[0, 2], R36[1, 2]))
 
             if s5_abs <= singularity_tolerance:
+                # Con sin(q5)=0, q4 y q6 se acoplan: fijar uno con q_seed.
                 q4 = float(seed[3])
                 if R36[2, 2] >= 0:
                     q5 = 0.0
@@ -192,6 +194,7 @@ def solve_pieper(
                     "de una familia continua."
                 )
             else:
+                # Muñeca regular: dos signos posibles para sin(q5).
                 candidates = []
                 for wrist_sign in (1, -1):
                     s5 = wrist_sign * s5_abs
@@ -201,6 +204,7 @@ def solve_pieper(
                     wrist_name = f"muneca_{'+' if wrist_sign > 0 else '-'}"
                     candidates.append((q4, q5, q6, wrist_name, False))
 
+            # Verificar con FK y conservar solamente ramas distintas y precisas.
             for q4, q5, q6, wrist_name, is_singular in candidates:
                 q = _wrap([q1, q2, q3, q4, q5, q6])
                 T_check = forward_kinematics(q)
