@@ -34,7 +34,7 @@ configurar ni mover el robot físico.
 | 10 | Requisitos y versiones | No contrastados | Pendiente | — | Por asignar | Elaborar matriz de compatibilidad |
 | 11 | Red y acceso institucional | No verificados | Pendiente | — | Por asignar | Consultar permisos |
 | 12 | Manual y seguridad local | No verificados | Pendiente | — | Por asignar | Consultar protocolo del laboratorio |
-| 13 | URDF, SRDF y otros modelos | URDF propio localizado; versiones por auditar | Pendiente | Hito 1 | Por asignar | Identificar commit y convenciones |
+| 13 | URDF, SRDF y otros modelos | URDF IRB 120 con 6 juntas revolutas, base_link y TCP provisional tcp; SRDF no localizado entre archivos rastreados | Confirmado | hito1/irb120_description/urdf/irb120.urdf; commit ae2cf35 | Por asignar | Verificar convenciones, transformaciones y correspondencia con ABB fisico |
 | 14 | Código previo de ajedrez | No auditado | Pendiente | — | Por asignar | Localizar antecedente |
 | 15 | Operador autorizado | No identificado | Pendiente | — | Por asignar | Confirmar con docente |
 
