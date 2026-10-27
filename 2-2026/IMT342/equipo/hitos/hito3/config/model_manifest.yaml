@@ -4,8 +4,9 @@ controller_model: null
 robotware_version: null
 controller_options_verified: []
 
-ros_distribution: null
-operating_system: null
+# Entorno local de desarrollo en Podman; no corresponde a la PC del laboratorio.
+ros_distribution: jazzy
+operating_system: "Ubuntu 24.04.4 LTS"
 
 kinematics_reference: null
 urdf_source_commit: ae2cf35

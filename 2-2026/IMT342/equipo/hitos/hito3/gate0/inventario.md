@@ -28,8 +28,8 @@ configurar ni mover el robot físico.
 | 4 | Opciones y licencias | No verificadas | Pendiente | — | Por asignar | Consultar configuración |
 | 5 | Interfaz permitida | No verificada | Pendiente | — | Por asignar | Investigar RWS, EGM u otra |
 | 6 | Estado y método de conexión | No verificado | Pendiente | — | Por asignar | Consultar laboratorio |
-| 7 | PC disponible y SO | PC del laboratorio no verificada | Pendiente | — | Por asignar | Identificar equipo disponible |
-| 8 | Distribución ROS | ROS 2 Jazzy documentado históricamente | Pendiente | Documentación previa del entorno | Por asignar | Revalidar instalación |
+| 7 | PC disponible y SO | PC personal: Fedora 44; PC del laboratorio no verificada | Pendiente | gate0/entorno_ros.md | Por asignar | Identificar PC del laboratorio |
+| 8 | Distribución ROS | ROS 2 Jazzy en Ubuntu 24.04.4 LTS mediante Podman rootless | Confirmado (entorno local) | gate0/entorno_ros.md | Por asignar | Evaluar compatibilidad ROS-ABB |
 | 9 | Driver candidato y versión | No seleccionado | Pendiente | — | Por asignar | Investigar alternativas |
 | 10 | Requisitos y versiones | No contrastados | Pendiente | — | Por asignar | Elaborar matriz de compatibilidad |
 | 11 | Red y acceso institucional | No verificados | Pendiente | — | Por asignar | Consultar permisos |
