@@ -1,0 +1,112 @@
+{
+  "fecha_utc": "2026-10-27T22:05:46.746259+00:00",
+  "modo": "offline",
+  "robot_modelo": "ABB IRB 120 academico",
+  "python": "3.14.8",
+  "numpy": "2.5.2",
+  "paso_diferencias_finitas_rad": 1e-06,
+  "longitud_referencia_m": 1.0,
+  "criterio_rango_relativo": 1e-09,
+  "casos": {
+    "VAL-01": {
+      "q_rad": [
+        0.3,
+        -0.4,
+        0.2,
+        0.3,
+        -0.2,
+        0.8
+      ],
+      "limites_cumplidos": true,
+      "violaciones": [],
+      "marco_objetivo": "tcp",
+      "rango_jacobiano": 6,
+      "sigma_min_normalizado": 0.02490850883340397,
+      "condicion_normalizada": 74.73577693567445,
+      "eJ_relativo": 5.211494677201453e-11,
+      "soluciones_ik": 8,
+      "soluciones_admisibles": 2,
+      "errores_soluciones_admisibles": [
+        {
+          "ep_m": 6.938893903907228e-17,
+          "eR_rad": 4.633486001851288e-16
+        },
+        {
+          "ep_m": 3.7263863056628965e-16,
+          "eR_rad": 5.204376831846875e-16
+        }
+      ],
+      "ep_max_m": 3.7263863056628965e-16,
+      "eR_max_rad": 5.204376831846875e-16
+    },
+    "VAL-02": {
+      "q_rad": [
+        0.3,
+        -0.35,
+        0.25,
+        0.4,
+        0.1,
+        -0.6
+      ],
+      "limites_cumplidos": true,
+      "violaciones": [],
+      "marco_objetivo": "tcp",
+      "rango_jacobiano": 6,
+      "sigma_min_normalizado": 0.013780175065410735,
+      "condicion_normalizada": 133.2892475738682,
+      "eJ_relativo": 5.121275377282839e-11,
+      "soluciones_ik": 8,
+      "soluciones_admisibles": 3,
+      "errores_soluciones_admisibles": [
+        {
+          "ep_m": 1.2412670766236366e-16,
+          "eR_rad": 4.996696115833367e-16
+        },
+        {
+          "ep_m": 1.2412670766236366e-16,
+          "eR_rad": 5.066078482722958e-16
+        },
+        {
+          "ep_m": 1.0007415106216802e-16,
+          "eR_rad": 5.299864942873025e-16
+        }
+      ],
+      "ep_max_m": 1.2412670766236366e-16,
+      "eR_max_rad": 5.299864942873025e-16
+    },
+    "VAL-03": {
+      "q_rad": [
+        0.3,
+        -0.35,
+        0.25,
+        0.4,
+        0.01,
+        -0.6
+      ],
+      "limites_cumplidos": true,
+      "violaciones": [],
+      "marco_objetivo": "tcp",
+      "rango_jacobiano": 6,
+      "sigma_min_normalizado": 0.0013860436843688702,
+      "condicion_normalizada": 1327.8915162855872,
+      "eJ_relativo": 6.163484612660818e-11
+    },
+    "SINGULAR": {
+      "q_rad": [
+        0.3,
+        -0.35,
+        0.25,
+        0.4,
+        0.0,
+        -0.6
+      ],
+      "limites_cumplidos": true,
+      "violaciones": [],
+      "marco_objetivo": "tcp",
+      "rango_jacobiano": 5,
+      "sigma_min_normalizado": 2.9935231113068693e-17,
+      "condicion_normalizada": null,
+      "eJ_relativo": 4.451617452227668e-11
+    }
+  }
+}

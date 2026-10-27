@@ -2,7 +2,7 @@
 
 Fecha: 2026-10-27
 Robot: ABB IRB 120
-Estado: PLANIFICADO / NO EJECUTADO
+Estado: EJECUTADO OFFLINE / SIN VALIDACION FISICA
 
 ## 1. Objetivo
 
@@ -73,7 +73,7 @@ Procedimiento previsto:
 9. Comparar Jacobiano analítico con diferencias
    finitas para obtener eJ.
 
-Estado: NO EJECUTADO EN HITO 3.
+Estado: EJECUTADO OFFLINE EN HITO 3.
 
 ## 6. VAL-02 — Configuración regular B
 
@@ -95,7 +95,7 @@ Procedimiento previsto:
    diferencias finitas.
 8. Registrar eJ y valores singulares.
 
-Estado: NO EJECUTADO EN HITO 3.
+Estado: EJECUTADO OFFLINE EN HITO 3.
 
 ## 7. VAL-03 — Proximidad a singularidad
 
@@ -126,7 +126,7 @@ clasifique como singular.
 La pérdida de rango y su magnitud deberán
 verificarse mediante la ejecución real.
 
-Estado: NO EJECUTADO EN HITO 3.
+Estado: EJECUTADO OFFLINE EN HITO 3.
 
 ## 8. Métricas de error
 
@@ -218,13 +218,85 @@ Para cada caso:
 
 ## 12. Estado de ejecución
 
-VAL-01: PLANIFICADO.
-VAL-02: PLANIFICADO.
-VAL-03: PLANIFICADO.
+VAL-01: EJECUTADO OFFLINE.
+VAL-02: EJECUTADO OFFLINE.
+VAL-03: EJECUTADO OFFLINE.
 
-No se realizaron cálculos nuevos ni
-ensayos físicos al elaborar este documento.
+Se ejecutaron validaciones numéricas offline.
+No se realizaron ensayos físicos.
 
 Siguiente acción:
-validación offline reproducible reutilizando
-el código del Hito 2.
+revisar los resultados y formalizar criterios
+de aceptación antes de Gate 2.
+
+## 13. Resultados offline observados
+
+Fecha de ejecución: 2026-10-27.
+
+Entorno:
+- Python 3.14.8.
+- NumPy 2.5.2.
+- Entorno virtual académico IMT-342.
+- Cálculos sin conexión al robot físico.
+
+Evidencias:
+- validacion/evaluar_cinematica.py
+- evidencias/validacion_cinematica.json
+
+### VAL-01
+
+- Límites: cumplidos.
+- Rango del Jacobiano: 6.
+- Número de condición: 74.73577693567445.
+- Error relativo eJ: 5.211494677201453e-11.
+- Soluciones IK: 8.
+- Soluciones admisibles: 2.
+- ep máximo: 3.7263863056628965e-16 m.
+- eR máximo: 5.204376831846875e-16 rad.
+
+### VAL-02
+
+- Límites: cumplidos.
+- Rango del Jacobiano: 6.
+- Número de condición: 133.2892475738682.
+- Error relativo eJ: 5.121275377282839e-11.
+- Soluciones IK: 8.
+- Soluciones admisibles: 3.
+- ep máximo: 1.2412670766236366e-16 m.
+- eR máximo: 5.299864942873025e-16 rad.
+
+### VAL-03
+
+- Límites: cumplidos.
+- q5: 0.01 rad.
+- Rango del Jacobiano: 6.
+- Número de condición: 1327.8915162855872.
+- Error relativo eJ: 6.163484612660818e-11.
+
+### Referencia singular
+
+- Límites: cumplidos.
+- q5: 0 rad.
+- Rango del Jacobiano: 5.
+- Valor singular mínimo: 2.9935231113068693e-17.
+- Número de condición: no definido como valor
+  finito bajo el criterio numérico adoptado.
+- Error relativo eJ: 4.451617452227668e-11.
+
+### Interpretación
+
+Las soluciones FK/IK presentan errores pequeños.
+
+El Jacobiano analítico concuerda con la
+aproximación por diferencias finitas.
+
+La aproximación a q5 = 0 incrementa
+la sensibilidad cinemática y la referencia
+singular presenta pérdida de rango.
+
+Estas conclusiones corresponden al modelo
+académico implementado y no al controlador
+físico ABB.
+
+Los umbrales formales de aceptación de Gate 2
+continúan pendientes de establecerse.
