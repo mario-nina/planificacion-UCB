@@ -1,0 +1,21 @@
+robot_model: ABB_IRB120
+
+controller_model: null
+robotware_version: null
+controller_options_verified: []
+
+ros_distribution: null
+operating_system: null
+
+kinematics_reference: null
+urdf_source_commit: null
+
+base_frame: null
+tcp_frame: null
+joint_order: []
+
+angle_unit: rad
+length_unit: m
+rpy_convention: null
+
+record_status: unverified
