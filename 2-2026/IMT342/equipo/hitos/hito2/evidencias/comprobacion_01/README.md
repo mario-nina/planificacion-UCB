@@ -1,1 +1,0 @@
-Comprobaciones manuales
