@@ -1,0 +1,5 @@
+numpy==2.5.2
+sympy==1.14.0
+matplotlib==3.11.1
+jupyterlab==4.6.3
+ipykernel==7.3.0
