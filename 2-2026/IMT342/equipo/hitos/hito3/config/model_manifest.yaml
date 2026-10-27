@@ -8,7 +8,8 @@ controller_options_verified: []
 ros_distribution: jazzy
 operating_system: "Ubuntu 24.04.4 LTS"
 
-kinematics_reference: null
+# Referencia al modelo académico; no al ABB físico.
+kinematics_reference: "2-2026/IMT342/equipo/hitos/hito2/docs/arquitectura_y_convenciones.md"
 urdf_source_commit: ae2cf35
 
 base_frame: base_link

@@ -4,7 +4,7 @@ Fuente: S12_material_oficial.pdf
 Documento original: w12_s01_gate0_ficha.pdf
 
 Grupo: pendiente
-Fecha de auditoría: pendiente
+Fecha de auditoría: 2026-10-27 (documental y entorno local; ABB físico no inspeccionado)
 Responsables: pendiente
 Supervisión: pendiente
 
@@ -28,13 +28,13 @@ configurar ni mover el robot físico.
 | 4 | Opciones y licencias | No verificadas | Pendiente | — | Por asignar | Consultar configuración |
 | 5 | Interfaz permitida | No verificada | Pendiente | — | Por asignar | Investigar RWS, EGM u otra |
 | 6 | Estado y método de conexión | No verificado | Pendiente | — | Por asignar | Consultar laboratorio |
-| 7 | PC disponible y SO | PC personal: Fedora 44; PC del laboratorio no verificada | Pendiente | gate0/entorno_ros.md | Por asignar | Identificar PC del laboratorio |
+| 7 | PC disponible y SO | Fedora 44 confirmado en PC personal; PC del laboratorio no verificada | Parcialmente verificado | gate0/entorno_ros.md | Por asignar | Identificar PC del laboratorio |
 | 8 | Distribución ROS | ROS 2 Jazzy en Ubuntu 24.04.4 LTS mediante Podman rootless | Confirmado (entorno local) | gate0/entorno_ros.md | Por asignar | Evaluar compatibilidad ROS-ABB |
-| 9 | Driver candidato y versión | abb_ros2 rolling e6486f7; abb_robot_driver master d167895; referencias remotas identificadas | Pendiente | gate0/compatibilidad_ros_abb.md | Por asignar | Verificar compatibilidad con Jazzy, RobotWare e IRB 120 |
-| 10 | Requisitos y versiones | No contrastados | Pendiente | — | Por asignar | Elaborar matriz de compatibilidad |
+| 9 | Driver candidato y versión | abb_ros2 rolling e6486f7 y abb_robot_driver master d167895 identificados; compatibilidad no probada | Parcialmente verificado | gate0/compatibilidad_ros_abb.md | Por asignar | Verificar compatibilidad con Jazzy, RobotWare e IRB 120 |
+| 10 | Requisitos y versiones | Requisitos candidatos documentados; sin contraste con controlador físico | Pendiente | gate0/compatibilidad_ros_abb.md; gate0/arquitecturas.md | Por asignar | Completar matriz de compatibilidad real |
 | 11 | Red y acceso institucional | No verificados | Pendiente | — | Por asignar | Consultar permisos |
 | 12 | Manual y seguridad local | No verificados | Pendiente | — | Por asignar | Consultar protocolo del laboratorio |
-| 13 | URDF, SRDF y otros modelos | URDF IRB 120 con 6 juntas revolutas, base_link y TCP provisional tcp; SRDF no localizado entre archivos rastreados | Confirmado | hito1/irb120_description/urdf/irb120.urdf; commit ae2cf35 | Por asignar | Verificar convenciones, transformaciones y correspondencia con ABB fisico |
+| 13 | URDF, SRDF y otros modelos | URDF IRB 120 disponible; FK/IK/J validados offline; SRDF no localizado entre archivos rastreados; correspondencia física pendiente | Parcialmente verificado | gate0/marcos_y_tcp.md; gate0/plan_validacion_cinematica.md; evidencias/validacion_cinematica.json | Por asignar | Verificar marcos, TCP y correspondencia con ABB físico |
 | 14 | Código previo de ajedrez | No auditado | Pendiente | — | Por asignar | Localizar antecedente |
 | 15 | Operador autorizado | No identificado | Pendiente | — | Por asignar | Confirmar con docente |
 
@@ -46,7 +46,9 @@ configurar ni mover el robot físico.
 
 ## Próximas actividades
 
-1. Auditar versiones y commits de los modelos propios.
-2. Verificar el entorno ROS disponible.
-3. Investigar controlador, interfaces y restricciones.
-4. Elaborar las hipótesis de compatibilidad.
+1. Solicitar identificación de controlador y RobotWare.
+2. Auditar licencias, interfaces y permisos del laboratorio.
+3. Verificar compatibilidad real de los drivers candidatos.
+4. Formalizar criterios de aceptación de Gate 2.
+5. Asignar responsables principales y suplentes.
+6. Mantener la decisión NO-GO para movimiento físico.
