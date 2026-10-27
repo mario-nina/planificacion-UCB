@@ -30,7 +30,7 @@ configurar ni mover el robot físico.
 | 6 | Estado y método de conexión | No verificado | Pendiente | — | Por asignar | Consultar laboratorio |
 | 7 | PC disponible y SO | PC personal: Fedora 44; PC del laboratorio no verificada | Pendiente | gate0/entorno_ros.md | Por asignar | Identificar PC del laboratorio |
 | 8 | Distribución ROS | ROS 2 Jazzy en Ubuntu 24.04.4 LTS mediante Podman rootless | Confirmado (entorno local) | gate0/entorno_ros.md | Por asignar | Evaluar compatibilidad ROS-ABB |
-| 9 | Driver candidato y versión | No seleccionado | Pendiente | — | Por asignar | Investigar alternativas |
+| 9 | Driver candidato y versión | abb_ros2 rolling e6486f7; abb_robot_driver master d167895; referencias remotas identificadas | Pendiente | gate0/compatibilidad_ros_abb.md | Por asignar | Verificar compatibilidad con Jazzy, RobotWare e IRB 120 |
 | 10 | Requisitos y versiones | No contrastados | Pendiente | — | Por asignar | Elaborar matriz de compatibilidad |
 | 11 | Red y acceso institucional | No verificados | Pendiente | — | Por asignar | Consultar permisos |
 | 12 | Manual y seguridad local | No verificados | Pendiente | — | Por asignar | Consultar protocolo del laboratorio |
