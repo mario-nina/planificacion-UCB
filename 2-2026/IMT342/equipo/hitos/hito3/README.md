@@ -13,12 +13,15 @@ Sistema de modelado, planificación, visualización y comunicación con el manip
 | [config/](config/) | Referencia histórica del modelo |
 | [validacion/](validacion/) | Validación cinemática inicial |
 | [evidencias/](evidencias/) | Registros seleccionados y procedencia experimental |
+| [informe/](informe/) | Informe final ECI-3/4, fuentes LaTeX, figuras y resultados |
 
 ## Alcance
 
 La aplicación dispone de modos offline, observación y control físico, dos backends RWS/RAPID, previsualización, tareas repetibles, análisis cinemático y gráficas. La entrega conserva el código fuente de la versión cerrada el 24/11/2026. El estado de validación se describe en [validación académica](software/docs/validacion.md). Las pruebas offline y los antecedentes físicos se distinguen por fecha y revisión; no constituyen certificación de seguridad ni calibración independiente.
 
 ## Documentación
+
+- [Informe final ECI-3/4 (PDF)](informe/informe.pdf)
 
 - [Arquitectura y componentes](software/docs/arquitectura.md)
 - [Instalación y operación](software/docs/operacion.md)
