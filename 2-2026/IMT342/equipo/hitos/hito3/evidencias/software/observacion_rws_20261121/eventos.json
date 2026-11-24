@@ -1,0 +1,24 @@
+[
+    {
+        "action": "Revise el backend y la publicación de articulaciones",
+        "cause": null,
+        "code": "SIN_FEEDBACK",
+        "detail": "Sin muestras en esta sesión",
+        "ensayo_al_observar": "",
+        "severity": "N/D",
+        "source": "N/D",
+        "status": "Listo",
+        "timestamp_ns": 1795299371209875500
+    },
+    {
+        "action": null,
+        "cause": null,
+        "code": null,
+        "detail": "Retroalimentación reciente",
+        "ensayo_al_observar": "",
+        "severity": "OK",
+        "source": "rws",
+        "status": "Listo",
+        "timestamp_ns": 1795299371309837800
+    }
+]

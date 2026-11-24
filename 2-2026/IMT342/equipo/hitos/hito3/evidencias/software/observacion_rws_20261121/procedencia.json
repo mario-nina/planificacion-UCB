@@ -1,0 +1,10 @@
+{
+  "registro_original": "IRB120-20261121-221855-b0a65ba4",
+  "estado_final": {
+    "mode": "observe",
+    "backend": "rws",
+    "source": "rws",
+    "status": "Listo"
+  },
+  "sha256_manifest_original": "0a8d53e77a614d0fbc018cec4a9263f8c2a0b2e4834e835f472fef051ad5fa1e"
+}

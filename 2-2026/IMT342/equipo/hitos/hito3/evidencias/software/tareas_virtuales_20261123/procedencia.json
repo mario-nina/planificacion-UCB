@@ -1,0 +1,10 @@
+{
+  "registro_original": "IRB120-20261123-191649-289df7ab",
+  "estado_final": {
+    "mode": "offline",
+    "backend": "rws_trajectory",
+    "source": "SIMULACIÓN OFFLINE",
+    "status": "Aplicación virtual terminada"
+  },
+  "sha256_manifest_original": "0a16d333edd17eb90e1f67c500365012f5ec920fc1ac4acdd3291823461e516a"
+}
