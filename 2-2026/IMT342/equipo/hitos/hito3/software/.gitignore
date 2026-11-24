@@ -1,0 +1,22 @@
+# Artefactos generados y configuraciones locales
+/ros2_ws/build/
+/ros2_ws/install/
+/ros2_ws/log/
+__pycache__/
+.pytest_cache/
+.venv/
+*.py[cod]
+*.egg-info/
+.ipynb_checkpoints/
+*.bak
+*.bak_*
+*.swp
+*.tar
+*.tar.gz
+*.zip
+.env
+.env.*
+*.pem
+*.key
+irc5_observe.yaml
+/evidence/
