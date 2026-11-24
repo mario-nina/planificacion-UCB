@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>imt342_irb120_rviz</name>
+  <version>0.1.0</version>
+  <description>Panel RViz de objetivos y observación para el ABB IRB 120.</description>
+  <maintainer email="maintainer@example.invalid">Equipo IMT-342</maintainer>
+  <license>TODO</license>
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <depend>rviz_common</depend>
+  <depend>rviz_rendering</depend>
+  <depend>rviz_ogre_vendor</depend>
+  <depend>pluginlib</depend>
+  <depend>rclcpp</depend>
+  <depend>sensor_msgs</depend>
+  <depend>std_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>trajectory_msgs</depend>
+  <depend>qtbase5-dev</depend>
+  <export><build_type>ament_cmake</build_type></export>
+</package>

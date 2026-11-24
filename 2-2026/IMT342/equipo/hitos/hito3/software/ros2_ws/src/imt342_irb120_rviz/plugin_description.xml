@@ -1,0 +1,17 @@
+<library path="imt342_irb120_rviz">
+  <class name="imt342_irb120_rviz/JointPanel"
+         type="imt342_irb120_rviz::JointPanel"
+         base_class_type="rviz_common::Panel">
+    <description>Objetivos J1–J6, TCP, telemetría y previsualización del IRB 120.</description>
+  </class>
+  <class name="imt342_irb120_rviz/AnalysisPanel"
+         type="imt342_irb120_rviz::AnalysisPanel"
+         base_class_type="rviz_common::Panel">
+    <description>Curvas, cinemática, singularidades y evidencia del IRB 120.</description>
+  </class>
+  <class name="imt342_irb120_rviz/ReferenceAxes"
+         type="imt342_irb120_rviz::ReferenceAxes"
+         base_class_type="rviz_common::Display">
+    <description>Ejes XYZ del marco base, brida y TCP activo.</description>
+  </class>
+</library>
