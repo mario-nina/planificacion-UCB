@@ -1,0 +1,9 @@
+imt342_coordinator:
+  ros__parameters:
+    rws_url: ""
+    rws_task: ""
+    rws_module: ""
+    rws_mechunit: ""
+    rws_tolerance_rad: 0.0
+    rws_timeout_sec: 2.0
+    rws_ack_timeout_sec: 5.0

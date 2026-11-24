@@ -1,0 +1,18 @@
+# Metros y radianes. Origen cell_frame: centro XY en el plano inferior.
+# Ajuste nominal: la base del IRB 120 queda prácticamente pegada a un muro.
+# Se mantiene geometry_verified=false hasta validarlo físicamente en la celda.
+geometry_verified: false
+frame:
+  xyz_m: [0.128, 0.0, 0.0]
+  rpy_rad: [0.0, 0.0, 0.0]
+walls:
+  outer_xy_m: [0.800, 0.800]
+  height_m: 0.200
+  thickness_m: 0.050
+mesh:
+  scale_to_m: 0.001
+  xyz_m: [-0.400, 0.400, 0.0]
+  rpy_rad: [1.5707963267948966, 0.0, 0.0]
+collision:
+  clearance_m: 0.002
+  joint_margin_rad: 0.005235987755982988

@@ -1,0 +1,107 @@
+Panels:
+  - Class: rviz_common/Displays
+    Name: Escena
+  - Class: imt342_irb120_rviz/JointPanel
+    Name: IRB 120
+  - Class: imt342_irb120_rviz/AnalysisPanel
+    Name: Análisis IRB 120
+    Align Bottom: true
+Visualization Manager:
+  Class: ""
+  Displays:
+    - Class: rviz_default_plugins/Grid
+      Name: Rejilla
+      Enabled: true
+      Cell Size: 0.20
+      Plane Cell Count: 12
+    - Class: rviz_default_plugins/MarkerArray
+      Name: Muros de la celda
+      Enabled: true
+      Topic:
+        Value: /imt342/cell_markers
+        Depth: 1
+        Durability Policy: Transient Local
+        Reliability Policy: Reliable
+        History Policy: Keep Last
+    - Class: rviz_default_plugins/MarkerArray
+      Name: Recorrido cartesiano de la celda
+      Enabled: true
+      Topic:
+        Value: /imt342/cell_task_markers
+        Depth: 1
+        Durability Policy: Transient Local
+        Reliability Policy: Reliable
+        History Policy: Keep Last
+    - Class: rviz_default_plugins/RobotModel
+      Name: Postura actual
+      Enabled: true
+      Alpha: 1
+      Description Source: Topic
+      Description Topic:
+        Value: /imt342/robot_description
+        Depth: 5
+        Durability Policy: Transient Local
+        Reliability Policy: Reliable
+        History Policy: Keep Last
+      Visual Enabled: true
+      Collision Enabled: false
+    - Class: rviz_default_plugins/RobotModel
+      Name: Previsualización
+      Enabled: true
+      Alpha: 0.42
+      Description Source: Topic
+      Description Topic:
+        Value: /imt342/preview_description
+        Depth: 5
+        Durability Policy: Transient Local
+        Reliability Policy: Reliable
+        History Policy: Keep Last
+      Visual Enabled: true
+      Collision Enabled: false
+    - Class: rviz_default_plugins/MarkerArray
+      Name: Rutas TCP planificadas
+      Enabled: true
+      Topic:
+        Value: /imt342/pose_route_markers
+        Depth: 1
+        Durability Policy: Transient Local
+        Reliability Policy: Reliable
+        History Policy: Keep Last
+    - Class: imt342_irb120_rviz/ReferenceAxes
+      Name: Ejes de referencia
+      Enabled: true
+    - Class: rviz_default_plugins/MarkerArray
+      Name: Singularidad
+      Enabled: false
+      Topic:
+        Value: /imt342/singularity_marker
+        Depth: 1
+        Durability Policy: Transient Local
+        Reliability Policy: Reliable
+        History Policy: Keep Last
+  Enabled: true
+  Global Options:
+    Background Color: 42; 45; 50
+    Fixed Frame: base_link
+    Frame Rate: 30
+  Name: root
+  Tools:
+    - Class: rviz_default_plugins/Interact
+    - Class: rviz_default_plugins/MoveCamera
+  Views:
+    Current:
+      Class: rviz_default_plugins/Orbit
+      Distance: 1.8
+      Focal Point: {X: 0.2, Y: 0, Z: 0.35}
+      Pitch: 0.35
+      Yaw: 0.8
+Window Geometry:
+  Escena:
+    collapsed: false
+  Height: 860
+  Hide Left Dock: false
+  Hide Right Dock: false
+  IRB 120:
+    collapsed: false
+  QMainWindow State: 000000ff00000000fd0000000200000000000001560000039dfc0200000001fb0000000c0045007300630065006e0061010000003b0000039d000000c700ffffff00000001000001ae0000039dfc0200000001fb0000000e0049005200420020003100320030010000003b0000039d0000010c00ffffff000004700000039d00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  Width: 1560

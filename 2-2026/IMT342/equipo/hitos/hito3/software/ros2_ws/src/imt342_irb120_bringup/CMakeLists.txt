@@ -1,0 +1,33 @@
+cmake_minimum_required(VERSION 3.16)
+project(imt342_irb120_bringup)
+find_package(ament_cmake REQUIRED)
+install(DIRECTORY launch config DESTINATION share/${PROJECT_NAME})
+set(rapid_source "${CMAKE_CURRENT_SOURCE_DIR}/../../../rapid/imt342/Imt342JointServer.mod")
+if(DEFINED ENV{IMT342_RAPID_SOURCE})
+  set(rapid_source "$ENV{IMT342_RAPID_SOURCE}")
+endif()
+install(FILES "${rapid_source}"
+  DESTINATION share/${PROJECT_NAME}/rapid)
+set(trajectory_source
+  "${CMAKE_CURRENT_SOURCE_DIR}/../../../experimental/trajectory_control/rws_rapid/Imt342TrajectoryRapid.mod")
+if(DEFINED ENV{IMT342_RWS_TRAJECTORY_SOURCE})
+  set(trajectory_source "$ENV{IMT342_RWS_TRAJECTORY_SOURCE}")
+endif()
+install(FILES "${trajectory_source}" DESTINATION share/${PROJECT_NAME}/rapid)
+install(PROGRAMS scripts/coordinator.py scripts/diagnostico.py DESTINATION lib/${PROJECT_NAME})
+install(FILES scripts/cell_scene.py DESTINATION lib/${PROJECT_NAME})
+include(CTest)
+if(BUILD_TESTING)
+  find_package(Python3 REQUIRED COMPONENTS Interpreter)
+  add_test(NAME session_offline COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/test/session_offline.py")
+  add_test(NAME rviz_analysis_session COMMAND "${Python3_EXECUTABLE}"
+    "${CMAKE_CURRENT_SOURCE_DIR}/test/rviz_analysis_session.py")
+  add_test(NAME coordinator_callbacks COMMAND "${Python3_EXECUTABLE}"
+    "${CMAKE_CURRENT_SOURCE_DIR}/test/coordinator_callbacks.py")
+  add_test(NAME diagnostico COMMAND "${Python3_EXECUTABLE}"
+    "${CMAKE_CURRENT_SOURCE_DIR}/test/test_diagnostico.py")
+  add_test(NAME cell_scene COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/test/test_cell_scene.py")
+  set_tests_properties(session_offline rviz_analysis_session PROPERTIES TIMEOUT 75)
+  set_tests_properties(coordinator_callbacks PROPERTIES TIMEOUT 150)
+endif()
+ament_package()
