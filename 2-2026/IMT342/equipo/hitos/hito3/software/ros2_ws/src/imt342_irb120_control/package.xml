@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>imt342_irb120_control</name>
+  <version>0.1.0</version>
+  <description>RWS/RAPID backends for the IRB 120.</description>
+  <maintainer email="imt342@example.invalid">Equipo IMT-342</maintainer>
+  <license>UNLICENSED</license>
+  <buildtool_depend>ament_python</buildtool_depend>
+  <exec_depend>imt342_irb120_planning</exec_depend>
+  <test_depend>python3-pytest</test_depend>
+  <exec_depend>python3-requests</exec_depend>
+  <export><build_type>ament_python</build_type></export>
+</package>
