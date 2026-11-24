@@ -1,0 +1,23 @@
+{
+  "id": "f71aa1fae7de446492dc247c17bf8fb0",
+  "records": 2466,
+  "unique_motion_samples": 273,
+  "tracking_samples": 239,
+  "rmse_deg": 2.0418164083607864,
+  "peak_deg": 18.362868081290852,
+  "arrival_max_deg": 0.015617820376064582,
+  "reference_s": 34.71084576937232,
+  "observed_s": 45.82938831099818,
+  "excess_pct": 32.03189750978783,
+  "shape_counts": [
+    28,
+    28,
+    28
+  ],
+  "shape_max_mm": 4.853434762081164,
+  "shape_rms_mm": 2.987033517646978,
+  "shape_z_max_mm": 4.580892514974096,
+  "phase2_reference_legs": 21,
+  "sigma_min": 7.39885739004009e-06,
+  "median_feedback_interval_s": 0.15213647550081077
+}
