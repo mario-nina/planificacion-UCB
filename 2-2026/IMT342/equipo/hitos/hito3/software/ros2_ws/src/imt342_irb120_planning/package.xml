@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>imt342_irb120_planning</name>
+  <version>0.1.0</version>
+  <description>IRB 120 joint-space profiles and Cartesian cell-task planning.</description>
+  <maintainer email="imt342@example.invalid">Equipo IMT-342</maintainer>
+  <license>UNLICENSED</license>
+  <buildtool_depend>ament_python</buildtool_depend>
+  <exec_depend>imt342_irb120_kinematics</exec_depend>
+  <test_depend>python3-pytest</test_depend>
+  <test_depend>imt342_irb120_description</test_depend>
+  <export><build_type>ament_python</build_type></export>
+</package>
