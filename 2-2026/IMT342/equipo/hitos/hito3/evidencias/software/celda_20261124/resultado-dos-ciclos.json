@@ -1,0 +1,56 @@
+{
+  "backend_selected": "rws",
+  "source": "SIMULACIÓN OFFLINE",
+  "mode": "offline",
+  "backend_connected": false,
+  "physical_armed": false,
+  "final_q_rad": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "verified_cycles": 2,
+  "verified_waypoints": 24,
+  "elapsed_s": 32.412789955788355,
+  "planned_duration_s": 32.412789955788355,
+  "cell_path": {
+    "variant": "over_wall",
+    "wall": "x_max",
+    "wall_label": "X+",
+    "home_q_rad": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "command_segments": 12,
+    "total_command_segments": 24,
+    "wall_clearance_min_m": 0.10000000000000009,
+    "wall_clearance_max_m": 0.10021628071808147,
+    "max_tcp_deviation_m": 0.005652007286143009,
+    "geometry": {
+      "xyz_m": [
+        0.04,
+        0.0,
+        -0.2
+      ],
+      "rpy_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "outer_xy_m": [
+        0.8,
+        0.8
+      ],
+      "height_m": 0.2,
+      "thickness_m": 0.05,
+      "verified": false
+    }
+  }
+}
