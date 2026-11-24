@@ -24,3 +24,12 @@ La aplicación dispone de modos offline, observación y control físico, dos bac
 - [Instalación y operación](software/docs/operacion.md)
 - [Modelo, planificación y tareas](software/docs/modelo_y_tareas.md)
 - [Validación y referencias](software/docs/validacion.md)
+
+## Evidencia complementaria
+
+- [Validación matemática histórica (offline)](evidencias/software/matematica_hito2/README.md).
+- [Observación RWS del 21/11/2026](evidencias/software/observacion_rws_20261121/README.md).
+- [Ensayo físico v2 del 23/11/2026](evidencias/software/ensayo_v2_20261123/README.md).
+- [Aplicación virtual del 23/11/2026](evidencias/software/tareas_virtuales_20261123/README.md).
+- [Entorno de ejecución e inventario de dependencias](software/docs/entorno/README.md).
+- [Compilación y pruebas offline de la copia Git](evidencias/software/compilacion_copia_git/README.md).
